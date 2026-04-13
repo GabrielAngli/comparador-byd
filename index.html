@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BYD · Comparador Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --byd-blue: #0A2E6E;
+  --byd-cyan: #00B4D8;
+  --byd-light: #78BFDB;
+  --byd-white: #F8FAFF;
+  --byd-dark: #07193D;
+  --byd-gray: #8A9AB5;
+  --byd-line: rgba(0,180,216,0.18);
+
+  --motive-autonomia: #00C896;
+  --motive-confort: #E8A838;
+  --motive-tecnologia: #00B4D8;
+  --motive-estatus: #C06BDD;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--byd-dark);
+  color: var(--byd-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BG ── */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,180,216,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,180,216,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--byd-line);
+  background: rgba(7,25,61,0.92);
+  backdrop-filter: blur(12px);
+}
+
+.logo-zone {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.byd-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 4px;
+  color: var(--byd-cyan);
+  line-height: 1;
+}
+
+.header-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--byd-gray);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid var(--byd-line);
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+
+.header-right {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--byd-gray);
+  letter-spacing: 1.5px;
+  text-align: right;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 60px 40px 40px;
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  letter-spacing: 3px;
+  color: var(--byd-white);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.hero h1 span { color: var(--byd-cyan); }
+
+.hero p {
+  font-size: 0.95rem;
+  color: var(--byd-gray);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* ── STEP CONTAINER ── */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── STEPS ── */
+.step-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  color: var(--byd-cyan);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.step-label::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background: var(--byd-line);
+}
+
+/* ── MODEL SELECTOR ── */
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.model-btn {
+  background: rgba(10,46,110,0.4);
+  border: 1px solid var(--byd-line);
+  border-radius: 8px;
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.model-btn:hover {
+  border-color: var(--byd-cyan);
+  background: rgba(0,180,216,0.08);
+}
+.model-btn.active {
+  border-color: var(--byd-cyan);
+  background: rgba(0,180,216,0.15);
+  box-shadow: 0 0 20px rgba(0,180,216,0.15);
+}
+
+.model-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 1.5px;
+  color: var(--byd-white);
+  display: block;
+  margin-bottom: 2px;
+}
+.model-type-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.tag-ev { background: rgba(0,200,150,0.15); color: var(--motive-autonomia); }
+.tag-dmi { background: rgba(0,180,216,0.15); color: var(--byd-cyan); }
+.tag-phev { background: rgba(192,107,221,0.15); color: var(--motive-estatus); }
+.tag-dmo { background: rgba(232,168,56,0.15); color: var(--motive-confort); }
+
+.model-price {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--byd-gray);
+}
+
+/* ── MOTIVE SELECTOR ── */
+.motive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+@media(min-width:600px){ .motive-grid{grid-template-columns: repeat(4,1fr);} }
+
+.motive-btn {
+  border-radius: 10px;
+  padding: 20px 16px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.motive-btn::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0.07;
+  transition: opacity 0.25s;
+}
+.motive-btn:hover::before, .motive-btn.active::before { opacity: 0.15; }
+.motive-btn.active { border-width: 2px; transform: translateY(-2px); }
+
+.motive-btn[data-motive="autonomia"] { background: rgba(0,200,150,0.08); }
+.motive-btn[data-motive="autonomia"]::before { background: var(--motive-autonomia); }
+.motive-btn[data-motive="autonomia"].active { border-color: var(--motive-autonomia); box-shadow: 0 0 24px rgba(0,200,150,0.2); }
+
+.motive-btn[data-motive="confort"] { background: rgba(232,168,56,0.08); }
+.motive-btn[data-motive="confort"]::before { background: var(--motive-confort); }
+.motive-btn[data-motive="confort"].active { border-color: var(--motive-confort); box-shadow: 0 0 24px rgba(232,168,56,0.2); }
+
+.motive-btn[data-motive="tecnologia"] { background: rgba(0,180,216,0.08); }
+.motive-btn[data-motive="tecnologia"]::before { background: var(--motive-tecnologia); }
+.motive-btn[data-motive="tecnologia"].active { border-color: var(--motive-tecnologia); box-shadow: 0 0 24px rgba(0,180,216,0.2); }
+
+.motive-btn[data-motive="estatus"] { background: rgba(192,107,221,0.08); }
+.motive-btn[data-motive="estatus"]::before { background: var(--motive-estatus); }
+.motive-btn[data-motive="estatus"].active { border-color: var(--motive-estatus); box-shadow: 0 0 24px rgba(192,107,221,0.2); }
+
+.motive-icon { font-size: 1.8rem; display:block; margin-bottom: 8px; }
+.motive-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 4px;
+}
+.motive-sub {
+  font-size: 0.68rem;
+  color: var(--byd-gray);
+  font-weight: 300;
+}
+
+/* ── COMPETITOR SELECTOR ── */
+.competitor-section { margin-bottom: 40px; }
+
+.competitor-input-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.comp-input {
+  background: rgba(10,46,110,0.4);
+  border: 1px solid var(--byd-line);
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: var(--byd-white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  flex: 1;
+  min-width: 200px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.comp-input:focus { border-color: var(--byd-cyan); }
+.comp-input::placeholder { color: var(--byd-gray); }
+
+.comp-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.comp-tag {
+  background: rgba(10,46,110,0.5);
+  border: 1px solid var(--byd-line);
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--byd-gray);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.comp-tag:hover { border-color: var(--byd-cyan); color: var(--byd-cyan); }
+.comp-tag.active { background: rgba(0,180,216,0.12); border-color: var(--byd-cyan); color: var(--byd-cyan); }
+
+/* ── GENERATE BTN ── */
+.gen-btn {
+  display: block;
+  margin: 0 auto 50px;
+  background: linear-gradient(135deg, var(--byd-blue), var(--byd-cyan));
+  border: none;
+  border-radius: 8px;
+  padding: 16px 48px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.gen-btn::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+}
+.gen-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,180,216,0.35); }
+.gen-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+/* ── RESULT CARD ── */
+#result { display:none; }
+#result.visible { display:block; animation: fadeUp 0.5s ease; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.result-card {
+  background: rgba(7,25,61,0.85);
+  border: 1px solid var(--byd-line);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+}
+
+/* ── CARD HEADER BAND ── */
+.card-band {
+  padding: 28px 32px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card-band::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0.12;
+}
+.band-autonomia::before { background: var(--motive-autonomia); }
+.band-confort::before { background: var(--motive-confort); }
+.band-tecnologia::before { background: var(--motive-tecnologia); }
+.band-estatus::before { background: var(--motive-estatus); }
+
+.card-band-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card-model-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 3px;
+  line-height: 1;
+  color: var(--byd-white);
+}
+.card-model-name span { color: var(--byd-cyan); }
+
+.card-motive-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.badge-autonomia { background: rgba(0,200,150,0.15); color: var(--motive-autonomia); border: 1px solid rgba(0,200,150,0.3); }
+.badge-confort { background: rgba(232,168,56,0.15); color: var(--motive-confort); border: 1px solid rgba(232,168,56,0.3); }
+.badge-tecnologia { background: rgba(0,180,216,0.15); color: var(--motive-tecnologia); border: 1px solid rgba(0,180,216,0.3); }
+.badge-estatus { background: rgba(192,107,221,0.15); color: var(--motive-estatus); border: 1px solid rgba(192,107,221,0.3); }
+
+.card-pain-point {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--byd-white);
+  line-height: 1.55;
+  margin-top: 16px;
+  max-width: 640px;
+  font-style: italic;
+}
+
+/* ── KEY METRICS ── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1px;
+  background: var(--byd-line);
+  border-top: 1px solid var(--byd-line);
+}
+
+.metric-cell {
+  background: rgba(7,25,61,0.9);
+  padding: 18px 20px;
+  text-align: center;
+}
+.metric-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-bottom: 4px;
+  display: block;
+}
+.metric-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--byd-gray);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ── BODY SECTIONS ── */
+.card-body { padding: 28px 32px; }
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  color: var(--byd-cyan);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background: var(--byd-line);
+}
+
+/* ── ARGUMENT PILLS ── */
+.args-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.arg-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(0,180,216,0.05);
+  border: 1px solid var(--byd-line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.arg-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--byd-cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.arg-text {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--byd-white);
+}
+.arg-text strong { color: var(--byd-cyan); font-weight: 500; }
+
+/* ── COMPARISON TABLE ── */
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  font-size: 0.82rem;
+}
+.comp-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--byd-gray);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--byd-line);
+}
+.comp-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,180,216,0.07);
+  vertical-align: top;
+  line-height: 1.45;
+}
+.comp-table tr.byd-row { background: rgba(0,180,216,0.07); }
+.comp-table tr.byd-row td:first-child {
+  font-weight: 600;
+  color: var(--byd-cyan);
+}
+.comp-table .win { color: var(--motive-autonomia); font-weight: 500; }
+.comp-table .lose { color: #FF6B6B; }
+.comp-table .neutral { color: var(--byd-gray); }
+
+/* ── VERDICT BOX ── */
+.verdict-box {
+  background: rgba(0,180,216,0.06);
+  border: 1px solid rgba(0,180,216,0.2);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.verdict-box::before {
+  content: '"';
+  position: absolute;
+  right: 20px;
+  top: -10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 8rem;
+  color: var(--byd-cyan);
+  opacity: 0.06;
+  line-height: 1;
+}
+.verdict-text {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--byd-white);
+}
+.verdict-text strong { color: var(--byd-cyan); }
+
+/* ── OBJECTIONS ── */
+.obj-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.obj-item {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--byd-line);
+}
+.obj-q {
+  background: rgba(255,107,107,0.08);
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  color: #FF9999;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.obj-q::before { content:'?'; font-family:'Bebas Neue',sans-serif; font-size:1rem; opacity:0.6; }
+.obj-a {
+  background: rgba(0,200,150,0.05);
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  color: var(--byd-white);
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.obj-a::before { content:'→'; color: var(--motive-autonomia); flex-shrink:0; }
+
+/* ── CTA FOOTER ── */
+.card-footer {
+  background: linear-gradient(135deg, rgba(10,46,110,0.8), rgba(0,180,216,0.1));
+  border-top: 1px solid var(--byd-line);
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  color: var(--byd-white);
+}
+.footer-price span {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--byd-gray);
+  letter-spacing: 1px;
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+}
+.cta-btn {
+  background: var(--byd-cyan);
+  border: none;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--byd-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.cta-btn:hover { background: var(--byd-white); transform: translateY(-1px); }
+
+/* ── LOADING ── */
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  display: none;
+}
+.loading-state.visible { display: block; }
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--byd-line);
+  border-top-color: var(--byd-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--byd-gray);
+  letter-spacing: 2px;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px) {
+  header { padding: 16px 20px; }
+  .container { padding: 0 16px 60px; }
+  .card-body, .card-band, .card-footer { padding: 20px 18px; }
+  .card-band-top { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-zone">
+    <div class="byd-wordmark">BYD</div>
+    <div class="header-tag">COMPARADOR INTELIGENTE</div>
+  </div>
+  <div class="header-right">
+    APV BYD CIUDAD DEL CARMEN<br>
+    Plaza Carmelita · Av. Insurgentes
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Encuentra tu <span>razón</span><br>para elegir BYD</h1>
+  <p>Selecciona el modelo, tu motivo de compra y el competidor que estás considerando</p>
+</div>
+
+<div class="container">
+
+  <!-- STEP 1: MODELO -->
+  <div class="step-label">01 · MODELO DE TU INTERÉS</div>
+  <div class="model-grid" id="modelGrid"></div>
+
+  <!-- STEP 2: MOTIVO -->
+  <div class="step-label">02 · LO QUE MÁS IMPORTA PARA TI</div>
+  <div class="motive-grid">
+    <button class="motive-btn" data-motive="autonomia">
+      <span class="motive-icon">⚡</span>
+      <span class="motive-title" style="color:var(--motive-autonomia)">Autonomía</span>
+      <span class="motive-sub">Rendimiento, ahorro en combustible y retorno de inversión</span>
+    </button>
+    <button class="motive-btn" data-motive="confort">
+      <span class="motive-icon">🛋️</span>
+      <span class="motive-title" style="color:var(--motive-confort)">Confort</span>
+      <span class="motive-sub">Espacio, materiales, pantallas y experiencia a bordo</span>
+    </button>
+    <button class="motive-btn" data-motive="tecnologia">
+      <span class="motive-icon">🔬</span>
+      <span class="motive-title" style="color:var(--motive-tecnologia)">Tecnología</span>
+      <span class="motive-sub">Blade Battery, ADAS, plataforma, VTOL y conectividad</span>
+    </button>
+    <button class="motive-btn" data-motive="estatus">
+      <span class="motive-icon">👑</span>
+      <span class="motive-title" style="color:var(--motive-estatus)">Estatus</span>
+      <span class="motive-sub">Presencia, exclusividad y lo que dice de ti ante los demás</span>
+    </button>
+  </div>
+
+  <!-- STEP 3: COMPETIDOR -->
+  <div class="competitor-section">
+    <div class="step-label">03 · ¿QUÉ OTRO AUTO ESTÁS CONSIDERANDO?</div>
+    <div class="competitor-input-row">
+      <input class="comp-input" id="compInput" type="text" placeholder="Escribe el auto que estás comparando (ej. Toyota RAV4, Nissan Kicks...)" autocomplete="off">
+    </div>
+    <div class="comp-suggestions" id="compSuggestions"></div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="gen-btn" id="genBtn" disabled onclick="generate()">GENERAR COMPARATIVA</button>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">ANALIZANDO PUNTO DE DOLOR · CONSTRUYENDO COMPARATIVA...</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result"></div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// BASE DE DATOS DE MODELOS
+// ─────────────────────────────────────────────
+const MODELS = [
+  {
+    id: 'dolphin-mini-300',
+    name: 'DOLPHIN MINI 300',
+    fullName: 'BYD DOLPHIN MINI EV 300KM',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 399800,
+    segment: 'Subcompacto eléctrico urbano',
+    platform: 'e-Platform 3.0',
+    motor: '70 kW (95 HP) · 180 Nm',
+    battery: 'Blade Battery 30.72 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '300 km NEDC / ~250 km real',
+    autonomiaTotal: '300 km (solo EV)',
+    consumo: '~13 kWh/100km',
+    aceleracion: '0-100 en 12.3s',
+    carga: 'AC 6.6kW / DC 40kW (20 min 30-80%)',
+    pantalla: '10.1"',
+    asistente: 'Hi BYD',
+    adas: 'AEB, alerta cambio de carril',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '294 L / 1,228 L (abatida)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: false,
+    segmento_precio: 'acceso',
+    competidores_sugeridos: ['Chevrolet Groove EV', 'Nissan Leaf', 'MINI Cooper SE', 'MG 4 EV', 'Renault Zoe'],
+    ahorro_mensual_gasolina: 3200,
+    roi_anios: 2.1,
+  },
+  {
+    id: 'dolphin-mini-380',
+    name: 'DOLPHIN MINI PLUS',
+    fullName: 'BYD DOLPHIN MINI PLUS 380KM',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 415800,
+    segment: 'Subcompacto eléctrico urbano plus',
+    platform: 'e-Platform 3.0',
+    motor: '70 kW (95 HP) · 180 Nm',
+    battery: 'Blade Battery 38.88 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '380 km NEDC / ~310 km real',
+    autonomiaTotal: '380 km (solo EV)',
+    consumo: '~13 kWh/100km',
+    aceleracion: '0-100 en 12.3s',
+    carga: 'AC 6.6kW / DC 40kW',
+    pantalla: '10.1"',
+    asistente: 'Hi BYD',
+    adas: 'AEB, alerta cambio de carril',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '294 L / 1,228 L (abatida)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: false,
+    segmento_precio: 'acceso',
+    competidores_sugeridos: ['Chevrolet Groove EV', 'Nissan Leaf', 'MG 4 EV', 'Kia Niro EV', 'Renault Zoe'],
+    ahorro_mensual_gasolina: 3200,
+    roi_anios: 2.3,
+  },
+  {
+    id: 'yuan-pro-dmi',
+    name: 'YUAN PRO DM-i',
+    fullName: 'BYD YUAN PRO DM-i (NUEVO 2026)',
+    type: 'PHEV', typeTag: 'tag-dmi',
+    price: 519999,
+    segment: 'SUV subcompacto híbrido enchufable · LANZAMIENTO',
+    platform: 'Super DM Platform',
+    motor: '1.5L 4 cilindros + Motor eléctrico · Sistema DM-i',
+    battery: 'Blade Battery 7.85 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '45 km modo eléctrico puro (NEDC)',
+    autonomiaTotal: '1,045 km combinados',
+    consumo: '24 km/L equivalente',
+    aceleracion: 'N/D (estimado ~12s)',
+    carga: 'AC doméstico o wallbox · Sin carga DC rápida',
+    pantalla: '12.8" táctil',
+    asistente: 'BYD App · Control AA remoto',
+    adas: 'Nivel 2: AEB, ICC, alerta carril, límite velocidad, luces altas',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '425 L / 1,332 L (abatida)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'volumen',
+    competidores_sugeridos: ['Nissan Kicks e-Power', 'Honda HR-V e:HEV', 'Hyundai Tucson HEV', 'Jetour S06 i-DM', 'Toyota Yaris Cross HEV', 'MG One HEV'],
+    ahorro_mensual_gasolina: 2800,
+    roi_anios: 1.8,
+  },
+  {
+    id: 'king-dmi',
+    name: 'KING DM-i',
+    fullName: 'BYD KING DM-i MY26',
+    type: 'PHEV', typeTag: 'tag-dmi',
+    price: 499800,
+    segment: 'Sedán híbrido enchufable ejecutivo accesible',
+    platform: 'DM-i 5.0',
+    motor: '1.5L + Motor eléctrico · 81 kW sistema',
+    battery: 'Blade Battery 8.32 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '50-80 km modo EV (NEDC)',
+    autonomiaTotal: '1,100+ km combinados',
+    consumo: '~23 km/L sin carga',
+    aceleracion: '0-100 en ~10s',
+    carga: 'AC wallbox incluido · Sin DC rápida',
+    pantalla: '12.8" giratoria',
+    asistente: 'Hi BYD',
+    adas: 'AEB, alerta carril, conducción autónoma Nivel 2',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '450 L',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'volumen',
+    competidores_sugeridos: ['Nissan Kicks e-Power', 'Toyota Corolla HEV', 'Kia Niro PHEV', 'Jetour S06 i-DM', 'Haval Jolion HEV'],
+    ahorro_mensual_gasolina: 2600,
+    roi_anios: 1.9,
+  },
+  {
+    id: 'yuan-pro-ev',
+    name: 'YUAN PRO EV',
+    fullName: 'BYD YUAN PRO EV MY26',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 579800,
+    segment: 'SUV subcompacto eléctrico premium',
+    platform: 'e-Platform 3.0 (CTB — Cell to Body)',
+    motor: '150 kW (204 HP) · 310 Nm',
+    battery: 'Blade Battery 49.92 kWh · LFP · CTB integrada',
+    batteryIP: 'IP67',
+    autonomiaEV: '430 km NEDC / ~360 km real',
+    autonomiaTotal: '430 km (solo EV)',
+    consumo: '~14.5 kWh/100km',
+    aceleracion: '0-100 en 7.9s',
+    carga: 'AC 7kW / DC 80kW (30 min 30-80%)',
+    pantalla: '12.8" giratoria · Cuadro digital',
+    asistente: 'Hi BYD con IA',
+    adas: 'AEB, alerta carril, asistente velocidad, cámara 360°',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '1,210 L (abatida)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'medio',
+    competidores_sugeridos: ['MG ZS EV', 'Chevrolet Equinox EV', 'Kia EV3', 'Nissan Ariya', 'Tesla Model 3 Standard'],
+    ahorro_mensual_gasolina: 3400,
+    roi_anios: 2.5,
+  },
+  {
+    id: 'song-pro-dmi',
+    name: 'SONG PRO DM-i',
+    fullName: 'BYD SONG PRO DM-i MY26',
+    type: 'PHEV', typeTag: 'tag-dmi',
+    price: 599880,
+    segment: 'SUV mediana híbrida enchufable · Estrella de ventas',
+    platform: 'DM-i 5.0',
+    motor: '1.5L + Motor eléctrico 132 kW · Sistema 192 HP',
+    battery: 'Blade Battery 15.87 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '110 km modo eléctrico (NEDC)',
+    autonomiaTotal: '1,100+ km combinados',
+    consumo: '~22 km/L sin carga',
+    aceleracion: '0-100 en 8.5s',
+    carga: 'AC wallbox 7kW incluido / Cargador emergencia 1.4kW',
+    pantalla: '15.6" giratoria',
+    asistente: 'Hi BYD con IA',
+    adas: 'ADAS Nivel 2: AEB, ICC, cámara 360°, monitoreo conductor',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '560 L / 1,000+ L (abatida)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'medio',
+    competidores_sugeridos: ['Toyota RAV4', 'Mazda CX-5', 'Honda CR-V', 'Kia Sportage HEV', 'Hyundai Tucson PHEV', 'Ford Escape PHEV'],
+    ahorro_mensual_gasolina: 3800,
+    roi_anios: 2.2,
+  },
+  {
+    id: 'song-plus-dmi',
+    name: 'SONG PLUS DM-i',
+    fullName: 'BYD SONG PLUS DM-i 1.5T FWD MY26',
+    type: 'PHEV', typeTag: 'tag-dmi',
+    price: 778800,
+    segment: 'SUV mediana-grande híbrida enchufable premium',
+    platform: 'DM-i 5.0 · Ocean Design',
+    motor: '1.5L Turbo + Motor eléctrico · Sistema 241 HP',
+    battery: 'Blade Battery 18.3 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '105 km modo eléctrico (NEDC)',
+    autonomiaTotal: '1,105 km combinados',
+    consumo: '5.1 L/100km (modo híbrido)',
+    aceleracion: '0-100 en 7.5s',
+    carga: 'AC wallbox 7kW incluido + VTOL 3.3kW + Cargador 1.4kW',
+    pantalla: '15.6" táctil',
+    asistente: 'Hi BYD con IA',
+    adas: 'ADAS avanzado Nivel 2, cámara 360°, HUD, piloto automático en carretera',
+    traccion: 'FWD',
+    asientos: '5',
+    cajuela: '750 L',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: true, nfc: true,
+    segmento_precio: 'alto',
+    competidores_sugeridos: ['Toyota RAV4 PHEV', 'Kia Sorento PHEV', 'Ford Escape PHEV', 'Jeep Compass 4xe', 'Mitsubishi Outlander PHEV'],
+    ahorro_mensual_gasolina: 4200,
+    roi_anios: 2.8,
+  },
+  {
+    id: 'seal-rwd',
+    name: 'SEAL RWD',
+    fullName: 'BYD SEAL RWD MY26',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 778800,
+    segment: 'Sedán deportivo eléctrico · e-Platform 3.0 CTB',
+    platform: 'e-Platform 3.0 CTB (Cell to Body) · Batería estructural',
+    motor: '230 kW (313 HP) · 360 Nm · RWD',
+    battery: 'Blade Battery 61.44 kWh · LFP · CTB',
+    batteryIP: 'IP68',
+    autonomiaEV: '460 km NEDC / ~400 km real',
+    autonomiaTotal: '460 km (solo EV)',
+    consumo: '~15.5 kWh/100km',
+    aceleracion: '0-100 en 5.9s',
+    carga: 'AC 11kW / DC 150kW (20 min 30-80%)',
+    pantalla: '15.6" giratoria + HUD',
+    asistente: 'Hi BYD con IA · Apple CarPlay / Android Auto',
+    adas: 'ADAS Nivel 2+: AEB, LKA, ICC, BSD, cámara 360°, monitoreo fatiga',
+    traccion: 'RWD · Suspensión trasera 5 brazos',
+    asientos: '5',
+    cajuela: '400 L + frunk 40 L',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'alto',
+    competidores_sugeridos: ['Tesla Model 3', 'BMW 330e', 'Audi A4 TFSI', 'Kia EV6', 'Hyundai Ioniq 6'],
+    ahorro_mensual_gasolina: 4500,
+    roi_anios: 2.6,
+  },
+  {
+    id: 'seal-awd',
+    name: 'SEAL AWD',
+    fullName: 'BYD SEAL AWD MY26',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 888800,
+    segment: 'Sedán eléctrico performance AWD',
+    platform: 'e-Platform 3.0 CTB · Dual Motor',
+    motor: '390 kW (530 HP) · 670 Nm · AWD',
+    battery: 'Blade Battery 82.56 kWh · LFP · CTB',
+    batteryIP: 'IP68',
+    autonomiaEV: '520 km NEDC / ~450 km real',
+    autonomiaTotal: '520 km (solo EV)',
+    consumo: '~16 kWh/100km',
+    aceleracion: '0-100 en 3.8s',
+    carga: 'AC 11kW / DC 150kW',
+    pantalla: '15.6" giratoria + HUD',
+    asistente: 'Hi BYD con IA',
+    adas: 'ADAS Nivel 2+: completo',
+    traccion: 'AWD eléctrico inteligente',
+    asientos: '5',
+    cajuela: '400 L + frunk 40 L',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'premium',
+    competidores_sugeridos: ['Tesla Model 3 Performance', 'BMW M340e', 'Porsche Taycan (base)', 'Kia EV6 GT', 'Audi e-tron GT (base)'],
+    ahorro_mensual_gasolina: 5000,
+    roi_anios: 3.2,
+  },
+  {
+    id: 'shark-gl',
+    name: 'SHARK GL',
+    fullName: 'BYD SHARK GL DM0 MY26',
+    type: 'DMO', typeTag: 'tag-dmo',
+    price: 899980,
+    segment: 'Pickup híbrida enchufable de trabajo y aventura',
+    platform: 'DM-O (Dual Motor Off-road) · Body on Frame',
+    motor: '1.5L Turbo + 2 motores eléctricos · 321 kW (437 HP) · 680 Nm',
+    battery: 'Blade Battery 29.58 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '80-100 km modo eléctrico',
+    autonomiaTotal: '840 km combinados',
+    consumo: '~7 L/100km modo híbrido',
+    aceleracion: '0-100 en 5.7s',
+    carga: 'AC wallbox 7kW / DC rápida + VTOL 6kW bidireccional',
+    pantalla: '14.6" principal + Pantalla trasera cabina',
+    asistente: 'Hi BYD · Control VTOL desde app',
+    adas: 'ADAS Nivel 2: AEB, BSD, LKA, ICC, cámara 360°',
+    traccion: 'AWD 4x4 · Diferencial electrónico · Bloqueo trasero',
+    asientos: '5',
+    cajuela: 'Caja pickup 1,500 kg carga · Remolque 4,500 kg',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: true, nfc: true,
+    segmento_precio: 'premium',
+    competidores_sugeridos: ['Ford Maverick Hybrid', 'Toyota Hilux 2.8', 'Ram 1500', 'Rivian R1T', 'Ford F-150 Hybrid', 'Nissan Frontier'],
+    ahorro_mensual_gasolina: 5500,
+    roi_anios: 2.4,
+  },
+  {
+    id: 'shark-gs',
+    name: 'SHARK GS',
+    fullName: 'BYD SHARK GS DM0 MY26',
+    type: 'DMO', typeTag: 'tag-dmo',
+    price: 969800,
+    segment: 'Pickup híbrida enchufable · Versión tope de gama',
+    platform: 'DM-O · Body on Frame · Off-road mode avanzado',
+    motor: '1.5L Turbo + 2 motores eléctricos · 321 kW (437 HP) · 680 Nm',
+    battery: 'Blade Battery 29.58 kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '80-100 km modo eléctrico',
+    autonomiaTotal: '840 km combinados',
+    consumo: '~7 L/100km modo híbrido',
+    aceleracion: '0-100 en 5.7s',
+    carga: 'AC wallbox 7kW / DC rápida + VTOL 6kW bidireccional',
+    pantalla: '14.6" + pantalla trasera + HUD',
+    asistente: 'Hi BYD · Modo camping · Control VTOL app',
+    adas: 'ADAS Nivel 2+: completo + cámara trasera 360° doble',
+    traccion: 'AWD 4x4 · Diferencial electrónico · Bloqueo 100%',
+    asientos: '5',
+    cajuela: 'Caja pickup 1,500 kg · Remolque 4,500 kg',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: true, nfc: true,
+    segmento_precio: 'premium',
+    competidores_sugeridos: ['Ford F-150 PowerBoost', 'Toyota Tundra i-Force Max', 'Ram 1500 TRX (aspiracional)', 'Rivian R1T', 'GMC Sierra AT4'],
+    ahorro_mensual_gasolina: 5500,
+    roi_anios: 2.8,
+  },
+  {
+    id: 'sealion',
+    name: 'SEALION 7',
+    fullName: 'BYD SEALION 7 EV MY26',
+    type: 'EV', typeTag: 'tag-ev',
+    price: 949800,
+    segment: 'SUV eléctrica performance · e-Platform 3.0',
+    platform: 'e-Platform 3.0 · Dual Motor AWD',
+    motor: '390 kW (530 HP) · AWD Dual Motor',
+    battery: 'Blade Battery 82.56 kWh · LFP · IP68',
+    batteryIP: 'IP68',
+    autonomiaEV: '520 km NEDC / ~450 km real',
+    autonomiaTotal: '520 km (solo EV)',
+    consumo: '~17 kWh/100km',
+    aceleracion: '0-100 en 3.8s',
+    carga: 'AC 11kW / DC 150kW',
+    pantalla: '15.6" giratoria + HUD + Cuadro digital',
+    asistente: 'Hi BYD IA · Apple CarPlay / Android Auto',
+    adas: 'ADAS Nivel 2+: DiPilot completo · 11 sensores · Cámara 360°',
+    traccion: 'AWD eléctrico inteligente + Control de descenso',
+    asientos: '5',
+    cajuela: '567 L / 1,789 L (abatida) + frunk',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'premium',
+    competidores_sugeridos: ['Tesla Model Y', 'Chevrolet Equinox EV AWD', 'Kia EV6 AWD', 'Hyundai Ioniq 5', 'Volkswagen ID.4 GTX', 'BMW iX3'],
+    ahorro_mensual_gasolina: 5200,
+    roi_anios: 3.0,
+  },
+  {
+    id: 'm9',
+    name: 'M9',
+    fullName: 'BYD M9 MY26',
+    type: 'PHEV', typeTag: 'tag-dmi',
+    price: 979800,
+    segment: 'Minivan premium híbrida enchufable · 6-7 pasajeros',
+    platform: 'DM-i 5.0 · 540 HP sistema',
+    motor: '1.5L Turbo + 2 motores eléctricos · 397 kW (540 HP)',
+    battery: 'Blade Battery 28+ kWh · LFP',
+    batteryIP: 'IP67',
+    autonomiaEV: '120+ km modo eléctrico (NEDC)',
+    autonomiaTotal: '1,000+ km combinados',
+    consumo: '~5.5 L/100km modo híbrido',
+    aceleracion: '0-100 en 8.1s (2.5 ton)',
+    carga: 'AC wallbox 7kW / DC + VTOL · Salida 220V AC interna',
+    pantalla: '15.6" principal + Pantallas individuales filas 2 y 3',
+    asistente: 'Hi BYD IA · Salida 220V interior · Control app',
+    adas: 'ADAS Nivel 2+: DiPilot · Conducción autónoma urbana asistida',
+    traccion: 'AWD eléctrico inteligente',
+    asientos: '6-7 (2+2+3)',
+    cajuela: 'Variable según config · Asientos premium masaje fila 2',
+    garantiaBat: '8 años / 200,000 km · 3 años mantenimiento gratis',
+    garantiaVeh: '6 años / 150,000 km · 1 año seguro gratis',
+    ota: true, vtol: true, nfc: true,
+    segmento_precio: 'lujo',
+    competidores_sugeridos: ['Toyota Sienna', 'Kia Carnival', 'Chrysler Pacifica Hybrid', 'Buick GL8', 'Honda Odyssey', 'Volkswagen Multivan'],
+    ahorro_mensual_gasolina: 5800,
+    roi_anios: 3.5,
+  },
+  {
+    id: 'atto8',
+    name: 'ATTO 8',
+    fullName: 'BYD ATTO 8 MY26',
+    type: 'PHEV', typeTag: 'tag-phev',
+    price: 1199800,
+    segment: 'SUV grande 7 plazas · DM-p (performance) · Tope de gama',
+    platform: 'DM-p 5.0 (Performance) · Suspensión adaptativa DiSus-C',
+    motor: '1.5L Turbo 110kW + 2 motores eléctricos 200kW c/u · Total ~540 HP · AWD',
+    battery: 'Blade Battery 35.6 kWh · LFP · Alta densidad',
+    batteryIP: 'IP67',
+    autonomiaEV: '152 km modo eléctrico (NEDC)',
+    autonomiaTotal: '1,030 km combinados',
+    consumo: '~5.0 L/100km modo híbrido',
+    aceleracion: '0-100 en 4.9s (2.65 ton)',
+    carga: 'AC wallbox 7kW / DC 40kW',
+    pantalla: '15.6" giratoria + HUD 26" W-HUD + Cuadro 10.25"',
+    asistente: 'Hi BYD IA Premium · DiPilot completo',
+    adas: 'DiPilot: LiDAR + 11 cámaras + radares · Nivel 2+ avanzado',
+    traccion: 'AWD inteligente · DiSus-C suspensión adaptativa activa',
+    asientos: '7 (2+3+2) · Masaje y calefacción filas 1 y 2',
+    cajuela: '270 L (3 filas) / 960 L (2 filas) / 1,960 L (1 fila)',
+    garantiaBat: '8 años / 200,000 km',
+    garantiaVeh: '6 años / 150,000 km',
+    ota: true, vtol: false, nfc: true,
+    segmento_precio: 'lujo',
+    competidores_sugeridos: ['Kia EV9', 'Volvo XC90 PHEV', 'BMW X5 xDrive50e', 'Jeep Grand Cherokee 4xe', 'Ford Explorer PHEV', 'Land Rover Defender PHEV'],
+    ahorro_mensual_gasolina: 6500,
+    roi_anios: 4.2,
+  }
+];
+
+// ─────────────────────────────────────────────
+// CONTENT ENGINE: Argumentos por motivo
+// ─────────────────────────────────────────────
+function getMotiveContent(model, motive, competitor) {
+  const comp = competitor || 'su competidor directo';
+  const precioDif = competitor ? '' : '';
+
+  const content = {
+    autonomia: {
+      painPoint: `Quieres un auto que no te tenga llenando el tanque cada semana. Aquí te explicamos en pesos y centavos qué tan diferente es tu vida con el ${model.fullName}.`,
+      metrics: [
+        { value: model.autonomiaEV.split(' ')[0], label: 'km eléctrico puro' },
+        { value: model.autonomiaTotal.split(' ')[0], label: 'km autonomía total' },
+        { value: model.consumo.split(' ')[0], label: 'eficiencia' },
+        { value: `$${(model.ahorro_mensual_gasolina/1000).toFixed(1)}k`, label: 'ahorro/mes estimado' }
+      ],
+      args: [
+        { text: `<strong>Ahorro mensual estimado de $${model.ahorro_mensual_gasolina.toLocaleString()} MXN</strong> en gasolina vs un auto de combustión equivalente, basado en un recorrido promedio de 1,500 km/mes en Ciudad del Carmen. En 12 meses acumulas más de $${(model.ahorro_mensual_gasolina*12).toLocaleString()} de ahorro.` },
+        { text: `Con <strong>${model.autonomiaTotal}</strong> nunca más calculas si te alcanza. ${model.type === 'PHEV' || model.type === 'DMO' ? 'Cargas en casa por la noche y manejas en modo eléctrico todo el día en ciudad. Solo usas gasolina en viajes largos.' : 'La carga nocturna en casa cuesta aproximadamente $80-120 pesos para 100% de autonomía.'}` },
+        { text: `La <strong>Blade Battery de ${model.battery.split(' ')[1]} kWh garantizada por 8 años/200,000 km</strong> no se degrada como las baterías NMC de la competencia. A diferencia de ${comp}, BYD usa química LFP que mantiene >80% de capacidad después de 3,000 ciclos.` },
+        { text: `<strong>Retorno de inversión estimado en ${model.roi_anios} años</strong>: la diferencia de precio respecto a ${comp} se recupera solo con el ahorro en combustible, sin contar el menor costo de mantenimiento (sin aceite, sin transmisión, menos frenos por regeneración).` },
+        { text: `Costo de "llenado" equivalente: <strong>$80-120 pesos por 100 km</strong> en modo eléctrico vs $300-500 pesos en gasolina para el mismo recorrido. El ${model.fullName} es 3-5 veces más barato por kilómetro.` }
+      ],
+      verdict: `El ${model.fullName} no es solo un auto más económico de llenar — es una decisión financiera inteligente. Mientras que ${comp} te sigue atando a los vaivenes del precio de la gasolina, tú controlas tu costo de transporte. En Ciudad del Carmen, donde los recorridos diarios son predecibles, las ventajas del ${model.type === 'EV' ? 'modo 100% eléctrico' : 'modo eléctrico diario con respaldo de gasolina'} se maximizan desde el primer mes. A los ${model.roi_anios} años ya recuperaste la diferencia de precio. Después de eso, cada mes es puro ahorro neto.`,
+      objections: [
+        { q: '¿Y si se me acaba la batería?', a: model.type === 'EV' ? `La autonomía real de ${model.autonomiaEV} cubre varios días de uso normal en Ciudad del Carmen. Además, el wallbox incluido garantiza que nunca arranques con menos del 100% si cargas cada noche.` : `El ${model.fullName} nunca te queda varado: cuando se acaba la batería eléctrica, el motor de gasolina toma el control automáticamente. Tienes ${model.autonomiaTotal} de autonomía total.` },
+        { q: '¿Sale más caro de mantener?', a: `Al contrario. Los motores eléctricos no necesitan cambios de aceite, filtros de combustible ni ajuste de clutch. El costo de mantenimiento en BYD es hasta 40% menor que en autos convencionales según datos de propietarios en México.` }
+      ]
+    },
+    confort: {
+      painPoint: `Pasas horas en tu auto. Mereces un espacio que se sienta como una extensión de tu oficina o tu hogar. El ${model.fullName} fue diseñado con ese estándar.`,
+      metrics: [
+        { value: model.pantalla.split('"')[0]+'"', label: 'pantalla táctil' },
+        { value: model.asientos, label: 'pasajeros' },
+        { value: model.cajuela.split('/')[0].trim().replace(' L','') + 'L', label: 'cajuela' },
+        { value: 'OTA', label: 'actualiz. remota' }
+      ],
+      args: [
+        { text: `<strong>Pantalla ${model.pantalla}</strong> — un centro de control cinematográfico en tu tablero. ${model.pantalla.includes('giratoria') ? 'La pantalla giratoria se adapta a tu preferencia: vertical para navegación, horizontal para medios.' : ''} Conectividad Apple CarPlay y Android Auto incluidos de serie.` },
+        { text: `<strong>Asistente de voz Hi BYD con inteligencia artificial</strong>: controla clima, música, navegación y funciones del auto sin soltar el volante. Más intuitivo que Alexa o Google en el contexto de conducción.` },
+        { text: `<strong>Actualizaciones Over The Air (OTA)</strong>: tu auto mejora mientras duermes. BYD lanza actualizaciones de software que pueden agregar funciones, mejorar la autonomía o actualizar el ADAS — sin ir a la agencia, sin costo. ${comp} probablemente no ofrezca esto a su nivel de precio.` },
+        { text: `<strong>Silencio de cabina superior</strong>: al operar en modo eléctrico, el ${model.fullName} elimina el ruido del motor. El sonido de la ciudad desaparece. Es una experiencia que quien lo prueba no quiere abandonar.` },
+        { text: `<strong>Cajuela de ${model.cajuela}</strong> — espacio pensado para la vida real. ${model.vtol ? 'Más el VTOL: puedes alimentar electricidad al campamento, al evento, a la obra o en casa durante un apagón.' : 'Versatilidad para el día a día y los fines de semana.'}` }
+      ],
+      verdict: `El ${model.fullName} no compite con ${comp} en hoja de especificaciones — compite en cómo te sientes cada mañana cuando subes a él. La cabina silenciosa, la pantalla intuitiva y la actualización constante via OTA hacen que sea un auto que mejora con el tiempo, no que envejece. Mientras ${comp} entrega lo mismo el día 1 que el día 1,000, el ${model.fullName} aprende y evoluciona contigo.`,
+      objections: [
+        { q: '¿La calidad de materiales es buena siendo marca china?', a: `BYD ha invertido masivamente en diseño de interiores desde 2021. El equipo de diseño global está dirigido por Wolfgang Egger, ex director de diseño de Audi. Los materiales y acabados del ${model.fullName} son comparables a marcas japonesas de precio superior.` },
+        { q: '¿Qué pasa con el soporte técnico del sistema digital?', a: `El sistema operativo de BYD recibe actualizaciones regulares via OTA. En México, BYD tiene soporte técnico con ingenieros certificados y la app BYD te conecta directamente con el vehículo para diagnósticos remotos.` }
+      ]
+    },
+    tecnologia: {
+      painPoint: `No buscas solo un auto. Buscas la tecnología más avanzada disponible en este segmento de precio. El ${model.fullName} es una declaración de que estás en la vanguardia.`,
+      metrics: [
+        { value: model.batteryIP, label: 'certificación batería' },
+        { value: model.platform.split('·')[0].trim(), label: 'plataforma' },
+        { value: model.vtol ? 'VTOL' : 'ADAS L2', label: model.vtol ? 'generador portátil' : 'conducción asistida' },
+        { value: 'OTA', label: 'actualizaciones' }
+      ],
+      args: [
+        { text: `<strong>Blade Battery con certificación ${model.batteryIP}</strong>: la batería más segura del mundo en su clase. A diferencia de baterías NMC de la competencia, la química LFP de BYD es incombustible, pasó la prueba de penetración con clavo sin incendiarse, y puede sumergirse en agua. No hay otra batería en este segmento de precio con estas características.` },
+        { text: `<strong>Plataforma ${model.platform}</strong>: ${model.platform.includes('CTB') ? 'tecnología Cell to Body donde la batería ES parte de la estructura del vehículo, aumentando rigidez y liberando espacio para los pasajeros. Exclusiva de BYD, ni Toyota ni Honda tienen esto en este rango de precio.' : model.platform.includes('Super DM') ? 'la nueva plataforma Super DM de BYD optimiza el espacio interior al mínimo y maximiza la eficiencia energética del sistema híbrido.' : model.platform.includes('DM-O') ? 'plataforma diseñada exclusivamente para uso off-road con dos motores eléctricos independientes que permiten torque vectorial. Ninguna pickup convencional ofrece esto.' : 'arquitectura de nueva energía de próxima generación, diseñada desde cero para maximizar eficiencia eléctrica e integración digital.'}` },
+        { text: `<strong>ADAS: ${model.adas}</strong>. El sistema de conducción asistida del ${model.fullName} es el más completo de su segmento. ${comp} típicamente no incluye freno automático de emergencia, control de crucero adaptativo y asistente de cambio de carril en equipamiento estándar.` },
+        { text: `${model.vtol ? `<strong>VTOL (Vehicle to Load) de ${model.id.includes('shark') ? '6kW' : '3.3kW'}</strong>: tu auto es un generador portátil. Puedes enchufar herramientas, electrodomésticos, cargar otros vehículos o alimentar tu casa en caso de apagón. Ningún ${comp} ofrece esto a ningún precio.` : `<strong>Actualizaciones OTA (Over The Air)</strong>: BYD es una empresa de tecnología que fabrica autos — no al revés. Tu ${model.fullName} puede recibir nuevas funciones, mejoras de autonomía y actualizaciones de seguridad sin visitar la agencia, igual que tu smartphone.`}` },
+        { text: `<strong>BYD es el mayor fabricante de baterías del mundo</strong>, con más de 30 años de I+D exclusivo en electroquímica. Su ventaja tecnológica no es de marketing: es estructural. ${comp} compra sus baterías a terceros. BYD las diseña, fabrica y optimiza todo internamente.` }
+      ],
+      verdict: `El ${model.fullName} es lo que obtienes cuando la empresa que durante 30 años dominó la industria de baterías decide hacer autos. La Blade Battery ${model.batteryIP}, la plataforma ${model.platform.split('·')[0].trim()} y el ADAS de Nivel 2${model.vtol ? ' más el VTOL' : ''} no son features adicionales — son el resultado de una ventaja tecnológica estructural que ${comp} no puede igualar a menos que pague el doble. Esta es la tecnología del futuro, disponible hoy, al precio de hoy.`,
+      objections: [
+        { q: '¿La tecnología china es confiable?', a: `BYD provee baterías a Toyota, Mercedes-Benz y Ford. Su tecnología Blade Battery es tan segura que BYD la somete públicamente a prueba de penetración con clavo, aplastamiento y cortocircuito. Ningún competidor hace esto porque ninguno tiene la misma confianza en su producto.` },
+        { q: '¿Qué pasa cuando los sistemas electrónicos fallan?', a: `El ${model.fullName} tiene diagnóstico remoto via app BYD y acceso de ingenieros certificados via OTA. Además, la arquitectura eléctrica de BYD está diseñada con sistemas de redundancia. La garantía de 6 años/150,000 km cubre todos los sistemas electrónicos del vehículo.` }
+      ]
+    },
+    estatus: {
+      painPoint: `Tu auto dice quién eres antes de que abras la boca. El ${model.fullName} no es para quien sigue tendencias — es para quien las define.`,
+      metrics: [
+        { value: '#1', label: 'ventas EV mundial' },
+        { value: '2026', label: 'modelo año' },
+        { value: model.price >= 900000 ? 'PREMIUM' : model.price >= 600000 ? 'ÉLITE' : 'VANGUARDIA', label: 'posicionamiento' },
+        { value: '80k+', label: 'unidades en México' }
+      ],
+      args: [
+        { text: `<strong>BYD es el #1 mundial en ventas de vehículos eléctricos</strong>, superando a Tesla en volumen global. Llegas a una reunión en un BYD y la conversación empieza antes de apagar el motor. No es la marca del que no supo — es la marca del que sabe lo que viene.` },
+        { text: `El ${model.fullName} <strong>con precio de ${(model.price/1000000).toFixed(2).replace('.',',')} millones</strong> te ubica en un segmento donde los demás llegan en ${comp}. La diferencia es visible. La distinción es real.` },
+        { text: `<strong>Ser pionero en Ciudad del Carmen</strong>: en una ciudad de ejecutivos petroleros, médicos y empresarios, llegar en un BYD ${model.name} comunica que tú tomas decisiones antes que los demás. Aquí eso vale.` },
+        { text: `<strong>Tecnología que impresiona en frío</strong>: ${model.vtol ? 'el VTOL (generador portátil de 6kW) — ninguna pickup en México tiene esto. Abres la caja, conectas el compresor, la sierra o el proyector, y los demás no saben qué miraron.' : model.pantalla.includes('15.6') ? 'la pantalla de 15.6 pulgadas giratoria domina la cabina. Cuando alguien sube al copiloto, el comentario es inevitable.' : `la pantalla de ${model.pantalla} y el silencio de la cabina eléctrica hacen que cualquiera que suba se pregunte qué está pasando.`}` },
+        { text: `<strong>Escasez relativa = exclusividad real</strong>: BYD vendió 80,000+ unidades en México, pero el ${model.fullName} sigue siendo poco común en Ciudad del Carmen. Quien lo tiene, llama la atención. Y con razón.` }
+      ],
+      verdict: `Hay autos que te llevan del punto A al punto B. Y hay autos que hacen que el punto A y el punto B recuerden que estuviste ahí. El ${model.fullName} es de los segundos. Mientras ${comp} te da lo que todos tienen, el BYD ${model.name} te da lo que define a quien va delante. En un mercado donde el ejecutivo que te recibe mira el estacionamiento antes de abrir la puerta, esto importa.`,
+      objections: [
+        { q: '¿No pierdo estatus por ser marca china?', a: `Samsung era "la marca coreana barata" en 2005. Hoy lidera el mercado premium global. BYD es hoy exactamente donde Samsung era entonces — y quien lo entendió primero fue quien capitalizó. En México, los ejecutivos que compraron BYD Shark y Seal en 2023-2024 ya son referencia en sus círculos.` },
+        { q: '¿Y el valor de reventa?', a: `BYD ha sostenido precios de reventa sólidos en México por la alta demanda y la escasez relativa. La demanda supera a la oferta en modelos como el Shark y el Seal. El mercado secundario está activo y los precios se mantienen mejor que muchos competidores japoneses o estadounidenses.` }
+      ]
+    }
+  };
+
+  return content[motive];
+}
+
+// ─────────────────────────────────────────────
+// COMPETITOR SUGGESTIONS PER MODEL
+// ─────────────────────────────────────────────
+let selectedModel = null;
+let selectedMotive = null;
+let selectedCompetitor = '';
+
+function renderModelGrid() {
+  const grid = document.getElementById('modelGrid');
+  grid.innerHTML = MODELS.map(m => `
+    <button class="model-btn" data-id="${m.id}" onclick="selectModel('${m.id}')">
+      <span class="model-type-tag ${m.typeTag}">${m.type}</span>
+      <span class="model-name">${m.name}</span>
+      <span class="model-price">$${m.price.toLocaleString()} MXN</span>
+    </button>
+  `).join('');
+}
+
+function selectModel(id) {
+  selectedModel = MODELS.find(m => m.id === id);
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-id="${id}"]`).classList.add('active');
+  updateSuggestions();
+  checkReady();
+}
+
+function updateSuggestions() {
+  const container = document.getElementById('compSuggestions');
+  if (!selectedModel) { container.innerHTML = ''; return; }
+  container.innerHTML = selectedModel.competidores_sugeridos.map(c => `
+    <span class="comp-tag" onclick="selectCompTag(this,'${c}')">${c}</span>
+  `).join('');
+}
+
+function selectCompTag(el, name) {
+  document.querySelectorAll('.comp-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('compInput').value = name;
+  selectedCompetitor = name;
+  checkReady();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderModelGrid();
+
+  document.querySelectorAll('.motive-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.motive-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMotive = btn.dataset.motive;
+      checkReady();
+    });
+  });
+
+  document.getElementById('compInput').addEventListener('input', (e) => {
+    selectedCompetitor = e.target.value;
+    document.querySelectorAll('.comp-tag').forEach(t => t.classList.remove('active'));
+    checkReady();
+  });
+});
+
+function checkReady() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = !(selectedModel && selectedMotive && selectedCompetitor.trim().length > 1);
+}
+
+// ─────────────────────────────────────────────
+// GENERATE
+// ─────────────────────────────────────────────
+function generate() {
+  const loading = document.getElementById('loadingState');
+  const result = document.getElementById('result');
+  loading.classList.add('visible');
+  result.classList.remove('visible');
+  result.innerHTML = '';
+
+  setTimeout(() => {
+    loading.classList.remove('visible');
+    buildCard();
+  }, 1200);
+}
+
+function buildCard() {
+  const m = selectedModel;
+  const motive = selectedMotive;
+  const comp = selectedCompetitor.trim();
+  const c = getMotiveContent(m, motive, comp);
+
+  const motiveColors = {
+    autonomia: 'var(--motive-autonomia)',
+    confort: 'var(--motive-confort)',
+    tecnologia: 'var(--motive-tecnologia)',
+    estatus: 'var(--motive-estatus)'
+  };
+  const motiveLabels = { autonomia:'⚡ AUTONOMÍA & ROI', confort:'🛋️ CONFORT', tecnologia:'🔬 TECNOLOGÍA', estatus:'👑 ESTATUS' };
+  const col = motiveColors[motive];
+
+  const metricsHTML = c.metrics.map(mt => `
+    <div class="metric-cell">
+      <span class="metric-value" style="color:${col}">${mt.value}</span>
+      <span class="metric-label">${mt.label}</span>
+    </div>
+  `).join('');
+
+  const argsHTML = c.args.map((a,i) => `
+    <div class="arg-item">
+      <span class="arg-num">0${i+1}</span>
+      <span class="arg-text">${a.text}</span>
+    </div>
+  `).join('');
+
+  // Comparison table
+  const compRows = buildCompTable(m, motive, comp);
+
+  const objHTML = c.objections.map(o => `
+    <div class="obj-item">
+      <div class="obj-q">${o.q}</div>
+      <div class="obj-a">${o.a}</div>
+    </div>
+  `).join('');
+
+  const html = `
+    <div class="result-card">
+      <div class="card-band band-${motive}">
+        <div class="card-band-top">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--byd-gray);letter-spacing:2px;margin-bottom:6px">BYD · ANÁLISIS PERSONALIZADO</div>
+            <div class="card-model-name">BYD <span>${m.name}</span></div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--byd-gray);letter-spacing:1px;margin-top:4px">${m.segment}</div>
+          </div>
+          <div>
+            <span class="card-motive-badge badge-${motive}">${motiveLabels[motive]}</span>
+            <div style="margin-top:8px;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--byd-gray);letter-spacing:1px">VS. ${comp.toUpperCase()}</div>
+          </div>
+        </div>
+        <p class="card-pain-point">${c.painPoint}</p>
+      </div>
+
+      <div class="metrics-row">${metricsHTML}</div>
+
+      <div class="card-body">
+
+        <div class="section-title">POR QUÉ EL ${m.name} GANA EN ${motive.toUpperCase()}</div>
+        <div class="args-list">${argsHTML}</div>
+
+        <div class="section-title">COMPARATIVA VS ${comp.toUpperCase()}</div>
+        <div style="overflow-x:auto">${compRows}</div>
+
+        <div class="section-title">VEREDICTO HONESTO</div>
+        <div class="verdict-box">
+          <p class="verdict-text">${c.verdict}</p>
+        </div>
+
+        <div class="section-title">OBJECIONES QUE TE PUEDES HACER</div>
+        <div class="obj-list">${objHTML}</div>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-price">
+          <span>Precio público con IVA + Wall Box</span>
+          $${m.price.toLocaleString()} MXN
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--byd-gray);text-align:right">
+            APV BYD CIUDAD DEL CARMEN<br>
+            WhatsApp: 55 7889 8322
+          </div>
+          <a class="cta-btn" href="https://wa.me/525578898322?text=Hola%20Gabriel%2C%20me%20interesa%20el%20BYD%20${encodeURIComponent(m.name)}%20y%20quiero%20más%20información." target="_blank">AGENDAR TEST DRIVE</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const result = document.getElementById('result');
+  result.innerHTML = html;
+  result.classList.add('visible');
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildCompTable(m, motive, comp) {
+  const rows = {
+    autonomia: [
+      { label:'Autonomía EV pura', byd: m.autonomiaEV, rival: rivalData(comp,'autonomia_ev'), desc:'km en modo 100% eléctrico' },
+      { label:'Autonomía total', byd: m.autonomiaTotal, rival: rivalData(comp,'autonomia_total'), desc:'' },
+      { label:'Eficiencia', byd: m.consumo, rival: rivalData(comp,'consumo'), desc:'' },
+      { label:'Garantía batería', byd: m.garantiaBat, rival: rivalData(comp,'garantia_bat'), desc:'' },
+      { label:'Ahorro estimado/mes', byd: `$${m.ahorro_mensual_gasolina.toLocaleString()} MXN`, rival: '$0 (gasolina)', desc:'' },
+      { label:'Precio base', byd: `$${m.price.toLocaleString()}`, rival: rivalData(comp,'precio'), desc:'' }
+    ],
+    confort: [
+      { label:'Pantalla principal', byd: m.pantalla, rival: rivalData(comp,'pantalla'), desc:'' },
+      { label:'Asistente de voz IA', byd: 'Hi BYD con IA', rival: rivalData(comp,'asistente'), desc:'' },
+      { label:'Actualización OTA', byd: '✓ Gratuita de por vida', rival: rivalData(comp,'ota'), desc:'' },
+      { label:'Capacidad cajuela', byd: m.cajuela, rival: rivalData(comp,'cajuela'), desc:'' },
+      { label:'Conectividad NFC', byd: m.nfc ? '✓ Llave NFC / Smartphone' : '—', rival: '—', desc:'' },
+      { label:'Precio base', byd: `$${m.price.toLocaleString()}`, rival: rivalData(comp,'precio'), desc:'' }
+    ],
+    tecnologia: [
+      { label:'Tipo de batería', byd: m.battery.split('·')[0].trim(), rival: rivalData(comp,'bateria'), desc:'' },
+      { label:'Certificación IP batería', byd: m.batteryIP, rival: rivalData(comp,'ip'), desc:'' },
+      { label:'Plataforma', byd: m.platform.split('·')[0].trim(), rival: rivalData(comp,'plataforma'), desc:'' },
+      { label:'ADAS / Conducción asistida', byd: m.adas.split(':')[0], rival: rivalData(comp,'adas'), desc:'' },
+      { label:'VTOL / Salida de energía', byd: m.vtol ? '✓ VTOL incluido' : 'No aplica', rival: rivalData(comp,'vtol'), desc:'' },
+      { label:'Actualizaciones OTA', byd: '✓ De por vida', rival: rivalData(comp,'ota_tec'), desc:'' }
+    ],
+    estatus: [
+      { label:'Posicionamiento global', byd: '#1 mundial en EVs 2024', rival: rivalData(comp,'posicionamiento'), desc:'' },
+      { label:'Precio exclusivo', byd: `$${m.price.toLocaleString()} MXN`, rival: rivalData(comp,'precio'), desc:'' },
+      { label:'Tecnología diferenciadora', byd: m.vtol ? 'VTOL + Blade IP67 + ADAS L2' : `Blade ${m.batteryIP} + ADAS L2`, rival: rivalData(comp,'tech_estatus'), desc:'' },
+      { label:'Presencia visual', byd: 'Diseño Ocean Face X / Wolfgang Egger', rival: 'Diseño convencional', desc:'' },
+      { label:'Garantía total', byd: m.garantiaBat + ' · batería', rival: rivalData(comp,'garantia'), desc:'' }
+    ]
+  };
+
+  const data = rows[motive];
+  return `
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>CRITERIO</th>
+          <th style="color:var(--byd-cyan)">BYD ${m.name}</th>
+          <th>${comp}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(r => `
+          <tr class="byd-row">
+            <td style="color:var(--byd-gray);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.5px">${r.label}</td>
+            <td class="win">${r.byd}</td>
+            <td class="neutral">${r.rival}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function rivalData(comp, field) {
+  // Generic competitive intel by keyword matching
+  const c = comp.toLowerCase();
+  const data = {
+    autonomia_ev: () => {
+      if(c.includes('kicks') || c.includes('epower')) return '~0 km (no es enchufable)';
+      if(c.includes('rav4 phev') || c.includes('rav4 plug')) return '~46 km';
+      if(c.includes('corolla')) return '~0 km (no es enchufable)';
+      if(c.includes('sienna')) return '~50 km';
+      if(c.includes('tesla model 3')) return '~430-550 km (solo EV)';
+      if(c.includes('tesla model y')) return '~450 km (solo EV)';
+      if(c.includes('bmw')) return '~60 km PHEV típico';
+      if(c.includes('kia ev6')) return '~480 km (solo EV)';
+      if(c.includes('ioniq')) return '~480 km (solo EV)';
+      if(c.includes('hilux') || c.includes('ranger') || c.includes('frontier') || c.includes('ram 1500') || c.includes('f-150') && !c.includes('hybrid')) return '0 km (diésel/gasolina puro)';
+      if(c.includes('hr-v') || c.includes('hrv')) return '~0 km (híbrido no enchufable)';
+      return 'Dato no disponible';
+    },
+    autonomia_total: () => {
+      if(c.includes('kicks')) return '~580 km';
+      if(c.includes('rav4 phev')) return '~750 km';
+      if(c.includes('corolla')) return '~900 km';
+      if(c.includes('sienna')) return '~900 km';
+      if(c.includes('tesla model 3')) return '430-550 km';
+      if(c.includes('tesla model y')) return '450 km';
+      if(c.includes('hilux')) return '~750 km';
+      if(c.includes('ranger')) return '~700 km';
+      if(c.includes('hr-v')) return '~620 km';
+      if(c.includes('cx-5')) return '~650 km';
+      return 'Similar (~600-800 km)';
+    },
+    consumo: () => {
+      if(c.includes('kicks')) return '~17 km/L';
+      if(c.includes('rav4') && !c.includes('phev')) return '~12 km/L';
+      if(c.includes('corolla')) return '~18 km/L (HEV)';
+      if(c.includes('hilux')) return '~9 km/L';
+      if(c.includes('ranger') || c.includes('f-150')) return '~8 km/L';
+      if(c.includes('cx-5')) return '~13 km/L';
+      if(c.includes('hr-v')) return '~16 km/L';
+      return '~12-15 km/L';
+    },
+    garantia_bat: () => {
+      if(c.includes('tesla')) return '8 años / 150,000 km';
+      if(c.includes('kia')) return '7 años / 150,000 km';
+      if(c.includes('toyota') || c.includes('lexus')) return '10 años / 250,000 km (HV)';
+      return '5-8 años según modelo';
+    },
+    precio: () => {
+      if(c.includes('kicks')) return '~$415,000-480,000 MXN';
+      if(c.includes('rav4') && c.includes('hybrid')) return '~$750,000-900,000 MXN';
+      if(c.includes('rav4')) return '~$600,000-750,000 MXN';
+      if(c.includes('corolla hev') || c.includes('corolla h')) return '~$430,000-500,000 MXN';
+      if(c.includes('tesla model 3')) return '~$750,000-1,000,000 MXN';
+      if(c.includes('tesla model y')) return '~$900,000-1,200,000 MXN';
+      if(c.includes('kia ev6')) return '~$900,000+ MXN';
+      if(c.includes('ioniq 6')) return '~$850,000+ MXN';
+      if(c.includes('hilux')) return '~$600,000-800,000 MXN';
+      if(c.includes('sienna')) return '~$1,000,000+ MXN';
+      if(c.includes('cx-5')) return '~$500,000-700,000 MXN';
+      if(c.includes('hr-v')) return '~$450,000-550,000 MXN';
+      if(c.includes('jetour') || c.includes('s06')) return '~$380,000-450,000 MXN';
+      return 'Similar o superior';
+    },
+    pantalla: () => {
+      if(c.includes('kicks')) return '8" (versión top)';
+      if(c.includes('rav4')) return '10.5" (versión top)';
+      if(c.includes('tesla')) return '15.4" táctil central';
+      if(c.includes('kia ev6')) return '12" táctil';
+      if(c.includes('ioniq')) return '12.3" táctil';
+      if(c.includes('cx-5')) return '10.25" (versión top)';
+      if(c.includes('hilux') || c.includes('ranger')) return '8-9" (versión top)';
+      if(c.includes('sienna')) return '9"';
+      return '7-10" dependiendo versión';
+    },
+    asistente: () => {
+      if(c.includes('tesla')) return 'Asistente de voz Tesla';
+      if(c.includes('kia') || c.includes('ioniq') || c.includes('hyundai')) return 'Hey Kia / Hey Car';
+      return 'Siri / Google (via CarPlay/Android Auto)';
+    },
+    ota: () => {
+      if(c.includes('tesla')) return '✓ Actualizaciones OTA';
+      if(c.includes('kia ev6') || c.includes('ioniq')) return '✓ OTA parcial';
+      return '✗ No incluye OTA';
+    },
+    cajuela: () => {
+      if(c.includes('rav4')) return '580 L / 1,690 L (abatida)';
+      if(c.includes('cx-5')) return '442 L / 1,504 L (abatida)';
+      if(c.includes('kicks')) return '432 L';
+      if(c.includes('tesla model 3')) return '594 L + frunk 88 L';
+      if(c.includes('kia ev6')) return '520 L / 1,300 L';
+      if(c.includes('sienna')) return '1,030 L (sin 3a fila)';
+      if(c.includes('hr-v')) return '393 L';
+      return 'Similar según segmento';
+    },
+    bateria: () => {
+      if(c.includes('tesla')) return 'NMC (Litio-Níquel-Manganeso)';
+      if(c.includes('kia') || c.includes('ioniq') || c.includes('hyundai')) return 'NMC / NCM';
+      if(c.includes('toyota') || c.includes('lexus')) return 'NiMH / Li-ion convencional';
+      if(c.includes('kicks') || c.includes('hr-v') || c.includes('corolla')) return 'NiMH (no enchufable)';
+      return 'Li-ion convencional NMC';
+    },
+    ip: () => {
+      if(c.includes('tesla')) return 'IP67 (estimado)';
+      if(c.includes('rivian')) return 'IP67';
+      return 'No certificada IP pública';
+    },
+    plataforma: () => {
+      if(c.includes('tesla model 3')) return 'Plataforma Tesla Gen 3';
+      if(c.includes('kia ev6') || c.includes('ioniq 6')) return 'E-GMP (Hyundai Group)';
+      if(c.includes('vw') || c.includes('id.4')) return 'MEB (Volkswagen)';
+      return 'Plataforma convencional adaptada';
+    },
+    adas: () => {
+      if(c.includes('tesla')) return 'Autopilot (pago extra)';
+      if(c.includes('kia ev6') || c.includes('ioniq')) return 'Level 2 · Highway Drive Assist';
+      if(c.includes('kicks') || c.includes('hr-v') || c.includes('cx-5')) return 'Safety Shield básico / i-Activesense';
+      if(c.includes('hilux') || c.includes('ranger')) return 'Safety básico sin conducción autónoma';
+      return 'ADAS básico (AEB + alerta carril)';
+    },
+    vtol: () => {
+      if(c.includes('rivian')) return '✓ (11kW, costo extra)';
+      if(c.includes('f-150') && c.includes('hybrid')) return '✓ Pro Power Onboard (~7.2kW)';
+      return '✗ No disponible';
+    },
+    ota_tec: () => {
+      if(c.includes('tesla')) return '✓ OTA robusto';
+      if(c.includes('rivian')) return '✓ OTA frecuente';
+      return '✗ Sin actualiz. remotas';
+    },
+    posicionamiento: () => {
+      if(c.includes('toyota')) return 'Top 5 mundial (convencional)';
+      if(c.includes('tesla')) return 'Líder EV premium (~2° global)';
+      if(c.includes('kia') || c.includes('hyundai')) return 'Top 3 EVs Korea';
+      return 'Fabricante regional/nicho';
+    },
+    tech_estatus: () => {
+      if(c.includes('tesla')) return 'EV puro + Autopilot (pago)';
+      if(c.includes('bmw') || c.includes('mercedes') || c.includes('audi')) return 'PHEV convencional + ADAS básico';
+      return 'Motor convencional + paquete seguridad';
+    },
+    garantia: () => {
+      if(c.includes('toyota')) return '3 años / 100,000 km';
+      if(c.includes('kia')) return '5 años / 100,000 km';
+      if(c.includes('bmw') || c.includes('mercedes') || c.includes('audi')) return '2-3 años estándar';
+      if(c.includes('tesla')) return '4 años o 80,000 km (vehículo)';
+      return '3-5 años según marca';
+    }
+  };
+
+  const fn = data[field];
+  return fn ? fn() : 'Consultar concesionario';
+}
+</script>
+</body>
+</html>
