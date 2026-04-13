@@ -665,8 +665,27 @@ header {
     <div class="header-tag">COMPARADOR INTELIGENTE</div>
   </div>
   <div class="header-right">
-    APV BYD CIUDAD DEL CARMEN<br>
-    Plaza Carmelita · Av. Insurgentes
+    <select id="plazaSelect" onchange="setPlaza()" style="
+      background: rgba(10,46,110,0.7);
+      border: 1px solid var(--byd-line);
+      border-radius: 4px;
+      color: var(--byd-white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      cursor: pointer;
+      outline: none;
+      text-align: right;
+    ">
+      <option value="">— Selecciona tu plaza —</option>
+      <option value="carmen">APV BYD · Ciudad del Carmen</option>
+      <option value="campeche">APV BYD · Campeche</option>
+      <option value="merida">APV BYD · Mérida</option>
+      <option value="cancun">APV BYD · Cancún</option>
+      <option value="playa">APV BYD · Playa del Carmen</option>
+      <option value="tuxtla">APV BYD · Tuxtla Gutiérrez</option>
+    </select>
   </div>
 </header>
 
@@ -676,6 +695,55 @@ header {
 </div>
 
 <div class="container">
+
+  <!-- STEP 0: PLAZA — MODO ASESOR -->
+  <div id="modoAsesor" style="margin-bottom:32px;display:flex;flex-direction:column;gap:10px">
+    <div class="step-label">00 · TUS DATOS DE ASESOR</div>
+    <select id="plazaSelectMain" onchange="setPlazaMain()" style="
+      width:100%;background:rgba(10,46,110,0.4);border:1px solid var(--byd-line);
+      border-radius:8px;color:var(--byd-white);font-family:'DM Sans',sans-serif;
+      font-size:0.9rem;padding:14px 16px;cursor:pointer;outline:none;
+      appearance:none;-webkit-appearance:none;">
+      <option value="">— Selecciona tu plaza del Grupo Farrera —</option>
+      <option value="carmen">APV BYD · Ciudad del Carmen</option>
+      <option value="campeche">APV BYD · Campeche</option>
+      <option value="merida">APV BYD · Mérida</option>
+      <option value="cancun">APV BYD · Cancún</option>
+      <option value="playa">APV BYD · Playa del Carmen</option>
+      <option value="tuxtla">APV BYD · Tuxtla Gutiérrez</option>
+    </select>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input id="asesorNombre" type="text" placeholder="Tu nombre (ej. Gabriel Angli)" oninput="checkReady()" style="
+        flex:1;min-width:180px;background:rgba(10,46,110,0.4);border:1px solid var(--byd-line);
+        border-radius:8px;color:var(--byd-white);font-family:'DM Sans',sans-serif;
+        font-size:0.9rem;padding:14px 16px;outline:none;">
+      <input id="asesorWA" type="text" placeholder="Tu WhatsApp sin + ni espacios (ej. 5578898322)" oninput="checkReady()" style="
+        flex:1;min-width:180px;background:rgba(10,46,110,0.4);border:1px solid var(--byd-line);
+        border-radius:8px;color:var(--byd-white);font-family:'DM Sans',sans-serif;
+        font-size:0.9rem;padding:14px 16px;outline:none;">
+    </div>
+    <button id="btnCopiarLink" onclick="generarLinkAsesor()" style="
+      background:rgba(0,180,216,0.12);border:1px solid var(--byd-cyan);border-radius:8px;
+      color:var(--byd-cyan);font-family:'Bebas Neue',sans-serif;font-size:1rem;
+      letter-spacing:2px;padding:13px 20px;cursor:pointer;transition:all 0.2s;width:100%;">
+      🔗 COPIAR MI LINK PERSONALIZADO
+    </button>
+    <p style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--byd-gray);letter-spacing:1px;text-align:center">
+      Ese link lleva tus datos precargados — tu cliente solo elige modelo, motivo y competidor
+    </p>
+  </div>
+
+  <!-- STEP 0: PLAZA — MODO CLIENTE (precargado desde URL) -->
+  <div id="modoClienteInfo" style="display:none;margin-bottom:32px;background:rgba(0,180,216,0.07);border:1px solid var(--byd-line);border-radius:10px;padding:16px 20px;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="flex:1">
+      <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--byd-gray);letter-spacing:2px;margin-bottom:4px">TU ASESOR BYD</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--byd-cyan)" id="clienteAsesorNombre"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--byd-gray)" id="clientePlazaNombre"></div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--byd-gray)">
+      WhatsApp: <span style="color:var(--byd-white)" id="clienteAsesorWA"></span>
+    </div>
+  </div>
 
   <!-- STEP 1: MODELO -->
   <div class="step-label">01 · MODELO DE TU INTERÉS</div>
@@ -731,6 +799,39 @@ header {
 
 <script>
 // ─────────────────────────────────────────────
+// PLAZAS DEL GRUPO FARRERA
+// ─────────────────────────────────────────────
+const PLAZAS = {
+  carmen:   { nombre: 'APV BYD · Ciudad del Carmen', ciudad: 'Ciudad del Carmen', whatsapp: '55 7889 8322', wa: '525578898322' },
+  campeche: { nombre: 'APV BYD · Campeche',          ciudad: 'Campeche',          whatsapp: 'Consultar plaza', wa: '525578898322' },
+  merida:   { nombre: 'APV BYD · Mérida',            ciudad: 'Mérida',            whatsapp: 'Consultar plaza', wa: '525578898322' },
+  cancun:   { nombre: 'APV BYD · Cancún',            ciudad: 'Cancún',            whatsapp: 'Consultar plaza', wa: '525578898322' },
+  playa:    { nombre: 'APV BYD · Playa del Carmen',  ciudad: 'Playa del Carmen',  whatsapp: 'Consultar plaza', wa: '525578898322' },
+  tuxtla:   { nombre: 'APV BYD · Tuxtla Gutiérrez',  ciudad: 'Tuxtla Gutiérrez',  whatsapp: 'Consultar plaza', wa: '525578898322' },
+};
+
+let selectedPlaza = 'carmen';
+
+function setPlaza() {
+  const val = document.getElementById('plazaSelect').value;
+  if(val) {
+    selectedPlaza = val;
+    const main = document.getElementById('plazaSelectMain');
+    if(main) main.value = val;
+    checkReady();
+  }
+}
+
+function setPlazaMain() {
+  const val = document.getElementById('plazaSelectMain').value;
+  if(val) {
+    selectedPlaza = val;
+    document.getElementById('plazaSelect').value = val;
+    checkReady();
+  }
+}
+
+// ─────────────────────────────────────────────
 // BASE DE DATOS DE MODELOS
 // ─────────────────────────────────────────────
 const MODELS = [
@@ -760,7 +861,7 @@ const MODELS = [
     garantiaVeh: '6 años / 150,000 km',
     ota: true, vtol: false, nfc: false,
     segmento_precio: 'acceso',
-    competidores_sugeridos: ['Chevrolet Groove EV', 'Nissan Leaf', 'MINI Cooper SE', 'MG 4 EV', 'Renault Zoe'],
+    competidores_sugeridos: ['Geely EX2 GL', 'Geely EX2 GF', 'Chevrolet Groove EV', 'Nissan Leaf', 'MG 4 EV', 'Renault Zoe'],
     ahorro_mensual_gasolina: 3200,
     roi_anios: 2.1,
   },
@@ -790,7 +891,7 @@ const MODELS = [
     garantiaVeh: '6 años / 150,000 km',
     ota: true, vtol: false, nfc: false,
     segmento_precio: 'acceso',
-    competidores_sugeridos: ['Chevrolet Groove EV', 'Nissan Leaf', 'MG 4 EV', 'Kia Niro EV', 'Renault Zoe'],
+    competidores_sugeridos: ['Geely EX2 GL', 'Geely EX2 GF', 'Chevrolet Groove EV', 'Nissan Leaf', 'MG 4 EV', 'Kia Niro EV'],
     ahorro_mensual_gasolina: 3200,
     roi_anios: 2.3,
   },
@@ -1161,11 +1262,24 @@ const MODELS = [
 // ─────────────────────────────────────────────
 function getMotiveContent(model, motive, competitor) {
   const comp = competitor || 'su competidor directo';
-  const precioDif = competitor ? '' : '';
+  const ciudad = PLAZAS[selectedPlaza] ? PLAZAS[selectedPlaza].ciudad : 'tu ciudad';
+
+  // Clasificador de tipo de competidor
+  const cl = comp.toLowerCase();
+  const esEV = cl.includes('geely')||cl.includes('ex2')||cl.includes('tesla')||cl.includes('ev6')||cl.includes('ioniq')||cl.includes('leaf')||cl.includes('mg4')||cl.includes('kia ev')||cl.includes('zoe')||cl.includes('ariya')||cl.includes('equinox ev')||cl.includes('mg zs ev')||cl.includes('niro ev')||cl.includes('id.4')||cl.includes('rivian');
+  const esHibrido = cl.includes('kicks')||cl.includes('epower')||cl.includes('hr-v')||cl.includes('hrv')||cl.includes('corolla hev')||cl.includes('sienna')||cl.includes('rav4 hybrid')||cl.includes('niro hev')||cl.includes('tucson hev')||cl.includes('sportage hev')||cl.includes('cx-60')||cl.includes('cx-90');
+  const esGasolina = !esEV && !esHibrido;
+  const tieneVTOL = cl.includes('rivian')||cl.includes('f-150 power');
+  const tieneOTA = cl.includes('tesla')||cl.includes('rivian')||cl.includes('ioniq')||cl.includes('ev6');
+  const tieneBladeSimilar = false; // ningún competidor tiene Blade Battery
 
   const content = {
     autonomia: {
-      painPoint: `Quieres un auto que no te tenga llenando el tanque cada semana. Aquí te explicamos en pesos y centavos qué tan diferente es tu vida con el ${model.fullName}.`,
+      painPoint: esEV
+        ? `Ambos son eléctricos — pero no toda la tecnología eléctrica es igual. Te mostramos por qué la Blade Battery y la plataforma BYD marcan una diferencia real en tu experiencia y en tu bolsillo.`
+        : esHibrido
+        ? `El ${comp} también ahorra combustible — pero sigue dependiendo de él. Aquí te explicamos la diferencia entre un híbrido convencional y conducir en modo 100% eléctrico todos los días.`
+        : `Quieres un auto que no te tenga llenando el tanque cada semana. Aquí te explicamos en pesos y centavos qué tan diferente es tu vida con el ${model.fullName}.`,
       metrics: [
         { value: model.autonomiaEV.split(' ')[0], label: 'km eléctrico puro' },
         { value: model.autonomiaTotal.split(' ')[0], label: 'km autonomía total' },
@@ -1173,41 +1287,86 @@ function getMotiveContent(model, motive, competitor) {
         { value: `$${(model.ahorro_mensual_gasolina/1000).toFixed(1)}k`, label: 'ahorro/mes estimado' }
       ],
       args: [
-        { text: `<strong>Ahorro mensual estimado de $${model.ahorro_mensual_gasolina.toLocaleString()} MXN</strong> en gasolina vs un auto de combustión equivalente, basado en un recorrido promedio de 1,500 km/mes en Ciudad del Carmen. En 12 meses acumulas más de $${(model.ahorro_mensual_gasolina*12).toLocaleString()} de ahorro.` },
-        { text: `Con <strong>${model.autonomiaTotal}</strong> nunca más calculas si te alcanza. ${model.type === 'PHEV' || model.type === 'DMO' ? 'Cargas en casa por la noche y manejas en modo eléctrico todo el día en ciudad. Solo usas gasolina en viajes largos.' : 'La carga nocturna en casa cuesta aproximadamente $80-120 pesos para 100% de autonomía.'}` },
-        { text: `La <strong>Blade Battery de ${model.battery.split(' ')[1]} kWh garantizada por 8 años/200,000 km</strong> no se degrada como las baterías NMC de la competencia. A diferencia de ${comp}, BYD usa química LFP que mantiene >80% de capacidad después de 3,000 ciclos.` },
-        { text: `<strong>Retorno de inversión estimado en ${model.roi_anios} años</strong>: la diferencia de precio respecto a ${comp} se recupera solo con el ahorro en combustible, sin contar el menor costo de mantenimiento (sin aceite, sin transmisión, menos frenos por regeneración).` },
-        { text: `Costo de "llenado" equivalente: <strong>$80-120 pesos por 100 km</strong> en modo eléctrico vs $300-500 pesos en gasolina para el mismo recorrido. El ${model.fullName} es 3-5 veces más barato por kilómetro.` }
+        { text: esEV
+            ? `<strong>Blade Battery ${model.batteryIP} vs batería LFP genérica del ${comp}</strong>: no son lo mismo. La Blade Battery de BYD tiene 30 años de I+D exclusivo, pasó la prueba pública de penetración con clavo sin incendiarse y está certificada ${model.batteryIP}. El ${comp} usa baterías de proveedor externo sin certificación IP publicada. La diferencia importa cuando el auto lleva años en circulación.`
+            : esHibrido
+            ? `<strong>Ahorro mensual estimado de $${model.ahorro_mensual_gasolina.toLocaleString()} MXN</strong> frente al ${comp} que, siendo híbrido convencional, sigue consumiendo gasolina en el 60-70% de sus recorridos. En 12 meses el diferencial supera los $${(model.ahorro_mensual_gasolina*12).toLocaleString()}.`
+            : `<strong>Ahorro mensual estimado de $${model.ahorro_mensual_gasolina.toLocaleString()} MXN</strong> en comparación con un auto de combustión, basado en 1,500 km/mes en ${ciudad}. En 12 meses acumulas más de $${(model.ahorro_mensual_gasolina*12).toLocaleString()} de ahorro real.`
+        },
+        { text: esEV
+            ? `<strong>Autonomía total ${model.autonomiaTotal}</strong> con carga nocturna desde casa a $80-120 pesos. La arquitectura de carga del ${model.fullName} está optimizada para ciclos diarios — diseñada para mantener >80% de capacidad después de 3,000 ciclos de carga.`
+            : esHibrido
+            ? `El ${comp} <strong>no puede enchufarse</strong> — nunca opera en modo 100% eléctrico. El ${model.fullName} con <strong>${model.autonomiaEV}</strong> en modo EV cubre todos tus recorridos diarios en ${ciudad} sin tocar la gasolina. Solo la usas cuando tú decides.`
+            : `Con <strong>${model.autonomiaTotal}</strong> nunca más calculas si te alcanza. ${model.type === 'PHEV' || model.type === 'DMO' ? 'Cargas en casa por la noche y manejas en modo eléctrico todo el día. Solo usas gasolina en viajes largos.' : 'La carga nocturna en casa cuesta aproximadamente $80-120 pesos para 100% de autonomía.'}`
+        },
+        { text: esEV
+            ? `<strong>Garantía de batería: 8 años / 200,000 km</strong> vs la cobertura de tren motriz del ${comp} a 150,000 km. BYD ofrece 50,000 km más de respaldo — en ${ciudad} eso equivale a casi 3 años adicionales de cobertura.`
+            : `<strong>Blade Battery ${model.batteryIP} garantizada 8 años / 200,000 km</strong>: la batería más confiable de su clase. La química LFP de BYD mantiene >80% de capacidad después de 3,000 ciclos — el doble de vida útil que las baterías NMC o NiMH del ${comp}.`
+        },
+        { text: esEV
+            ? `<strong>Retorno de inversión en ${model.roi_anios} años</strong>: aunque ambos son eléctricos, el menor costo de mantenimiento del ${model.fullName} (plataforma nativa EV, frenos regenerativos más eficientes, sistema de suspensión simplificado) genera un ahorro adicional de $800-1,200 MXN/mes frente al ${comp}.`
+            : esHibrido
+            ? `<strong>Retorno de inversión en ${model.roi_anios} años</strong>: la diferencia de precio frente al ${comp} se recupera con el ahorro en gasolina, más el menor costo de mantenimiento — sin cambios de aceite frecuentes, sin correa de distribución, con frenos que duran el doble gracias a la regeneración.`
+            : `<strong>Retorno de inversión en ${model.roi_anios} años</strong>: la diferencia de precio frente al ${comp} se recupera solo con el ahorro en combustible, sin contar el menor costo de mantenimiento — sin aceite, sin transmisión compleja, menos desgaste en frenos por regeneración.`
+        },
+        { text: esEV
+            ? `<strong>Plataforma ${model.platform.split('·')[0].trim()} nativa EV</strong>: diseñada desde cero para vehículos eléctricos. El ${comp} parte de una arquitectura convencional adaptada. La diferencia se traduce en mayor eficiencia energética, mejor distribución de peso y más espacio interior real.`
+            : esHibrido
+            ? `Costo por kilómetro: <strong>$0.05-0.08 MXN/km en modo eléctrico</strong> vs $0.30-0.50 MXN/km del ${comp} en modo híbrido. El ${model.fullName} es 4-6 veces más económico en los recorridos diarios donde más tiempo pasas.`
+            : `Costo por kilómetro: <strong>$80-120 pesos por 100 km</strong> en modo eléctrico vs $300-500 pesos en gasolina con el ${comp}. El ${model.fullName} es 3-5 veces más barato por cada kilómetro recorrido.`
+        }
       ],
-      verdict: `El ${model.fullName} no es solo un auto más económico de llenar — es una decisión financiera inteligente. Mientras que ${comp} te sigue atando a los vaivenes del precio de la gasolina, tú controlas tu costo de transporte. En Ciudad del Carmen, donde los recorridos diarios son predecibles, las ventajas del ${model.type === 'EV' ? 'modo 100% eléctrico' : 'modo eléctrico diario con respaldo de gasolina'} se maximizan desde el primer mes. A los ${model.roi_anios} años ya recuperaste la diferencia de precio. Después de eso, cada mes es puro ahorro neto.`,
+      verdict: esEV
+        ? `El ${model.fullName} y el ${comp} comparten la filosofía eléctrica — pero no la misma tecnología ni el mismo respaldo. Mientras el ${comp} usa baterías de terceros sin certificación IP pública, el ${model.fullName} lleva la Blade Battery ${model.batteryIP} diseñada internamente por la empresa con más experiencia en baterías del mundo. Con ${model.autonomiaTotal} de autonomía, garantía de 8 años / 200,000 km y actualizaciones OTA de por vida, el ${model.fullName} no solo compite — lidera.`
+        : esHibrido
+        ? `El ${comp} es un buen híbrido — pero sigue siendo un auto de gasolina con asistencia eléctrica. El ${model.fullName} es un auto eléctrico con respaldo de gasolina cuando lo necesitas. La diferencia no es semántica: en ${ciudad}, donde los recorridos diarios son predecibles, el ${model.fullName} opera en modo eléctrico el 90% del tiempo. El ${comp} nunca puede hacer eso. A los ${model.roi_anios} años ya recuperaste la diferencia de precio — después de eso es ahorro neto mes a mes.`
+        : `El ${model.fullName} no es solo un auto más económico de operar — es una decisión financiera inteligente. Mientras el ${comp} te ata a los vaivenes del precio de la gasolina, tú controlas tu costo de transporte. En ${ciudad} los recorridos son predecibles, y eso maximiza las ventajas del ${model.type === 'EV' ? 'modo 100% eléctrico' : 'modo eléctrico diario'}. A los ${model.roi_anios} años recuperaste la diferencia. Después, cada mes es puro ahorro neto.`,
       objections: [
-        { q: '¿Y si se me acaba la batería?', a: model.type === 'EV' ? `La autonomía real de ${model.autonomiaEV} cubre varios días de uso normal en Ciudad del Carmen. Además, el wallbox incluido garantiza que nunca arranques con menos del 100% si cargas cada noche.` : `El ${model.fullName} nunca te queda varado: cuando se acaba la batería eléctrica, el motor de gasolina toma el control automáticamente. Tienes ${model.autonomiaTotal} de autonomía total.` },
-        { q: '¿Sale más caro de mantener?', a: `Al contrario. Los motores eléctricos no necesitan cambios de aceite, filtros de combustible ni ajuste de clutch. El costo de mantenimiento en BYD es hasta 40% menor que en autos convencionales según datos de propietarios en México.` }
+        { q: '¿Y si se me acaba la batería?', a: model.type === 'EV'
+            ? `La autonomía real de ${model.autonomiaEV} cubre varios días de uso normal en ${ciudad}. El wallbox incluido garantiza que nunca arranques con menos del 100% si cargas cada noche.`
+            : `El ${model.fullName} nunca te deja varado: cuando la batería eléctrica se agota, el motor de gasolina toma el control automáticamente. Tienes ${model.autonomiaTotal} de autonomía combinada.`
+        },
+        { q: esEV ? `¿No es lo mismo que el ${comp} siendo los dos eléctricos?` : '¿Sale más caro de mantener?',
+          a: esEV
+            ? `No. La Blade Battery ${model.batteryIP} de BYD tiene certificación de inmersión en agua y pasó la prueba pública de penetración con clavo. El ${comp} usa baterías de terceros sin estos estándares publicados. Además, BYD tiene 30 años fabricando baterías — el ${comp} compra las suyas.`
+            : `Al contrario. Sin aceite, sin filtros de combustible, sin ajuste de clutch. El costo de mantenimiento de BYD es hasta 40% menor que un auto convencional según datos de propietarios en México.`
+        }
       ]
     },
     confort: {
-      painPoint: `Pasas horas en tu auto. Mereces un espacio que se sienta como una extensión de tu oficina o tu hogar. El ${model.fullName} fue diseñado con ese estándar.`,
+      painPoint: `Pasas horas en tu auto. Mereces un espacio que se sienta como una extensión de tu oficina o tu hogar. Aquí te mostramos por qué el ${model.fullName} gana en experiencia a bordo frente al ${comp}.`,
       metrics: [
         { value: model.pantalla.split('"')[0]+'"', label: 'pantalla táctil' },
         { value: model.asientos, label: 'pasajeros' },
-        { value: model.cajuela.split('/')[0].trim().replace(' L','') + 'L', label: 'cajuela' },
+        { value: model.cajuela.split('/')[0].trim().replace(' L','')+'L', label: 'cajuela' },
         { value: 'OTA', label: 'actualiz. remota' }
       ],
       args: [
-        { text: `<strong>Pantalla ${model.pantalla}</strong> — un centro de control cinematográfico en tu tablero. ${model.pantalla.includes('giratoria') ? 'La pantalla giratoria se adapta a tu preferencia: vertical para navegación, horizontal para medios.' : ''} Conectividad Apple CarPlay y Android Auto incluidos de serie.` },
-        { text: `<strong>Asistente de voz Hi BYD con inteligencia artificial</strong>: controla clima, música, navegación y funciones del auto sin soltar el volante. Más intuitivo que Alexa o Google en el contexto de conducción.` },
-        { text: `<strong>Actualizaciones Over The Air (OTA)</strong>: tu auto mejora mientras duermes. BYD lanza actualizaciones de software que pueden agregar funciones, mejorar la autonomía o actualizar el ADAS — sin ir a la agencia, sin costo. ${comp} probablemente no ofrezca esto a su nivel de precio.` },
-        { text: `<strong>Silencio de cabina superior</strong>: al operar en modo eléctrico, el ${model.fullName} elimina el ruido del motor. El sonido de la ciudad desaparece. Es una experiencia que quien lo prueba no quiere abandonar.` },
-        { text: `<strong>Cajuela de ${model.cajuela}</strong> — espacio pensado para la vida real. ${model.vtol ? 'Más el VTOL: puedes alimentar electricidad al campamento, al evento, a la obra o en casa durante un apagón.' : 'Versatilidad para el día a día y los fines de semana.'}` }
+        { text: esEV
+            ? `<strong>Pantalla ${model.pantalla} vs la del ${comp}</strong>: ambos tienen pantalla grande, pero el sistema operativo BYD integra en una sola interfaz el control del vehículo, la climatización, la navegación y los modos de conducción — no es un tablet adaptado. ${model.pantalla.includes('giratoria') ? 'Además gira: vertical para navegación, horizontal para medios.' : ''}`
+            : `<strong>Pantalla ${model.pantalla}</strong>${model.pantalla.includes('giratoria') ? ' giratoria — vertical para navegación, horizontal para medios' : ''}: un centro de control diseñado para el auto, no adaptado de un dispositivo externo. Mientras el ${comp} ofrece pantallas de 7-10" en versión base, el ${model.fullName} tiene esta pantalla de serie en toda la gama.`
+        },
+        { text: `<strong>Asistente de voz Hi BYD con inteligencia artificial nativa</strong>: controla clima, música, navegación y funciones del auto sin soltar el volante. ${tieneOTA ? `A diferencia del asistente del ${comp}, Hi BYD está integrado directamente con todos los sistemas del vehículo — sin depender de conectividad con tu celular.` : `El ${comp} depende de Siri o Google vía CarPlay para comandos de voz — Hi BYD es IA nativa del auto, siempre disponible incluso sin señal.`}` },
+        { text: `<strong>Actualizaciones Over The Air (OTA) de por vida</strong>: el ${model.fullName} mejora mientras duermes. BYD lanza actualizaciones que agregan funciones, mejoran autonomía y actualizan el ADAS sin ir a la agencia ni pagar nada. ${tieneOTA ? `El ${comp} también tiene OTA, pero BYD tiene un historial de actualizaciones más frecuentes y gratuitas en México.` : `El ${comp} no ofrece OTA — lo que compras el día 1 es exactamente lo que tendrás en 5 años.`}` },
+        { text: `<strong>Silencio de cabina</strong>: ${esEV ? `ambos operan en silencio eléctrico, pero el ${model.fullName} tiene mayor insonorización de cabina gracias a la rigidez estructural de la plataforma ${model.platform.split('·')[0].trim()}, diseñada desde cero para EVs — no adaptada de un chasis convencional.` : esHibrido ? `en modo eléctrico el ${model.fullName} elimina completamente el ruido del motor. El ${comp} como híbrido convencional siempre tiene el motor de gasolina activo — nunca alcanza este nivel de silencio.` : `al operar en modo eléctrico, el ${model.fullName} elimina el ruido del motor por completo. El ${comp} con motor de combustión nunca puede igualar esta experiencia.`}` },
+        { text: `<strong>Cajuela ${model.cajuela}</strong> — espacio diseñado para la vida real. ${model.vtol ? `Más el VTOL: conectas hasta ${model.id.includes('shark') ? '6kW' : '3.3kW'} de electricidad para alimentar herramientas, electrodomésticos o dispositivos en cualquier lugar. El ${comp} no tiene nada comparable.` : esEV ? `La distribución interior aprovecha mejor el espacio al no tener motor de combustión ni transmisión convencional — similar al ${comp} en volumen pero con mejor accesibilidad.` : `Versatilidad para el día a día y los fines de semana, con espacio para pasajeros sin comprometer la cajuela.`}` }
       ],
-      verdict: `El ${model.fullName} no compite con ${comp} en hoja de especificaciones — compite en cómo te sientes cada mañana cuando subes a él. La cabina silenciosa, la pantalla intuitiva y la actualización constante via OTA hacen que sea un auto que mejora con el tiempo, no que envejece. Mientras ${comp} entrega lo mismo el día 1 que el día 1,000, el ${model.fullName} aprende y evoluciona contigo.`,
+      verdict: esEV
+        ? `El ${model.fullName} y el ${comp} compiten en la misma liga de confort digital — pero la experiencia BYD está construida como ecosistema completo, no como piezas ensambladas. La pantalla ${model.pantalla}, el asistente Hi BYD con IA nativa, las actualizaciones OTA de por vida y la integración total con la app BYD crean una experiencia que el ${comp} replica en partes, pero no en conjunto. Tu auto debería mejorar con el tiempo — el ${model.fullName} lo hace.`
+        : esHibrido
+        ? `El ${comp} ofrece confort funcional — pero el ${model.fullName} ofrece una experiencia. La pantalla ${model.pantalla}, el silencio total en modo eléctrico, el asistente Hi BYD con IA nativa y las actualizaciones OTA gratuitas hacen que cada día al volante sea diferente al anterior. Mientras el ${comp} entrega lo mismo en el año 1 que en el año 5, el ${model.fullName} aprende y evoluciona contigo.`
+        : `El ${model.fullName} no compite con el ${comp} en hoja de especificaciones — compite en cómo te sientes cada mañana cuando subes a él. La cabina silenciosa, la pantalla intuitiva y las actualizaciones OTA hacen de este un auto que mejora con el tiempo. Mientras el ${comp} entrega lo mismo el día 1 que el día 1,000, el ${model.fullName} aprende y evoluciona contigo.`,
       objections: [
-        { q: '¿La calidad de materiales es buena siendo marca china?', a: `BYD ha invertido masivamente en diseño de interiores desde 2021. El equipo de diseño global está dirigido por Wolfgang Egger, ex director de diseño de Audi. Los materiales y acabados del ${model.fullName} son comparables a marcas japonesas de precio superior.` },
-        { q: '¿Qué pasa con el soporte técnico del sistema digital?', a: `El sistema operativo de BYD recibe actualizaciones regulares via OTA. En México, BYD tiene soporte técnico con ingenieros certificados y la app BYD te conecta directamente con el vehículo para diagnósticos remotos.` }
+        { q: '¿La calidad de materiales es comparable siendo marca china?', a: `BYD ha invertido masivamente en diseño de interiores desde 2021 con un equipo dirigido por Wolfgang Egger, ex director de diseño de Audi. Los materiales y acabados del ${model.fullName} son comparables — y en pantalla y conectividad superan — a marcas japonesas y europeas de precio similar o superior.` },
+        { q: esEV ? `¿El sistema digital es tan bueno como el del ${comp}?` : '¿Qué pasa con el soporte técnico del sistema digital?',
+          a: esEV
+            ? `Hi BYD tiene integración nativa con todos los sistemas del vehículo — clima, conducción, carga y diagnóstico. El ${comp} depende de apps de terceros para funciones equivalentes. Además, BYD actualiza su sistema vía OTA — el ${comp} requiere visitas al taller para actualizaciones de software.`
+            : `El sistema operativo BYD recibe actualizaciones via OTA. En México, BYD tiene ingenieros certificados y la app BYD permite diagnósticos remotos directamente desde tu teléfono.`
+        }
       ]
     },
     tecnologia: {
-      painPoint: `No buscas solo un auto. Buscas la tecnología más avanzada disponible en este segmento de precio. El ${model.fullName} es una declaración de que estás en la vanguardia.`,
+      painPoint: `No buscas solo un auto. Buscas la tecnología más avanzada disponible en este precio. Aquí te explicamos por qué el ${model.fullName} gana en tecnología frente al ${comp} — con datos, no con marketing.`,
       metrics: [
         { value: model.batteryIP, label: 'certificación batería' },
         { value: model.platform.split('·')[0].trim(), label: 'plataforma' },
@@ -1215,20 +1374,34 @@ function getMotiveContent(model, motive, competitor) {
         { value: 'OTA', label: 'actualizaciones' }
       ],
       args: [
-        { text: `<strong>Blade Battery con certificación ${model.batteryIP}</strong>: la batería más segura del mundo en su clase. A diferencia de baterías NMC de la competencia, la química LFP de BYD es incombustible, pasó la prueba de penetración con clavo sin incendiarse, y puede sumergirse en agua. No hay otra batería en este segmento de precio con estas características.` },
-        { text: `<strong>Plataforma ${model.platform}</strong>: ${model.platform.includes('CTB') ? 'tecnología Cell to Body donde la batería ES parte de la estructura del vehículo, aumentando rigidez y liberando espacio para los pasajeros. Exclusiva de BYD, ni Toyota ni Honda tienen esto en este rango de precio.' : model.platform.includes('Super DM') ? 'la nueva plataforma Super DM de BYD optimiza el espacio interior al mínimo y maximiza la eficiencia energética del sistema híbrido.' : model.platform.includes('DM-O') ? 'plataforma diseñada exclusivamente para uso off-road con dos motores eléctricos independientes que permiten torque vectorial. Ninguna pickup convencional ofrece esto.' : 'arquitectura de nueva energía de próxima generación, diseñada desde cero para maximizar eficiencia eléctrica e integración digital.'}` },
-        { text: `<strong>ADAS: ${model.adas}</strong>. El sistema de conducción asistida del ${model.fullName} es el más completo de su segmento. ${comp} típicamente no incluye freno automático de emergencia, control de crucero adaptativo y asistente de cambio de carril en equipamiento estándar.` },
-        { text: `${model.vtol ? `<strong>VTOL (Vehicle to Load) de ${model.id.includes('shark') ? '6kW' : '3.3kW'}</strong>: tu auto es un generador portátil. Puedes enchufar herramientas, electrodomésticos, cargar otros vehículos o alimentar tu casa en caso de apagón. Ningún ${comp} ofrece esto a ningún precio.` : `<strong>Actualizaciones OTA (Over The Air)</strong>: BYD es una empresa de tecnología que fabrica autos — no al revés. Tu ${model.fullName} puede recibir nuevas funciones, mejoras de autonomía y actualizaciones de seguridad sin visitar la agencia, igual que tu smartphone.`}` },
-        { text: `<strong>BYD es el mayor fabricante de baterías del mundo</strong>, con más de 30 años de I+D exclusivo en electroquímica. Su ventaja tecnológica no es de marketing: es estructural. ${comp} compra sus baterías a terceros. BYD las diseña, fabrica y optimiza todo internamente.` }
+        { text: esEV
+            ? `<strong>Blade Battery ${model.batteryIP} vs batería LFP del ${comp}</strong>: el ${comp} también usa LFP, pero no es lo mismo. La Blade Battery de BYD elimina el separador entre celdas aumentando densidad energética un 50%, tiene certificación ${model.batteryIP} de inmersión en agua y pasó la prueba pública de penetración con clavo. El ${comp} compra sus baterías a terceros — BYD las diseña, fabrica y certifica internamente.`
+            : `<strong>Blade Battery con certificación ${model.batteryIP}</strong>: la batería más segura de su clase. La química LFP es incombustible, pasó la prueba de penetración con clavo sin incendiarse y resiste inmersión en agua. El ${comp} ${esHibrido ? 'usa baterías NiMH o Li-ion convencional sin estas certificaciones' : 'no tiene batería eléctrica de alta capacidad — depende 100% de gasolina'}.`
+        },
+        { text: `<strong>Plataforma ${model.platform.split('·')[0].trim()}</strong>: ${model.platform.includes('CTB') ? `tecnología Cell to Body — la batería ES parte de la estructura del vehículo. Exclusiva de BYD. ${esEV ? `El ${comp} usa una arquitectura modular estándar donde la batería es un módulo separado.` : `El ${comp} no tiene nada comparable a este nivel de integración.`}` : model.platform.includes('Super DM') ? `nueva plataforma híbrida que optimiza el espacio interior y maximiza la eficiencia del sistema eléctrico. ${esHibrido ? `El ${comp} usa una plataforma convencional con motor eléctrico añadido — no diseñada desde cero para híbridos.` : `El ${comp} no tiene plataforma dedicada para sistemas electrificados.`}` : model.platform.includes('DM-O') ? `plataforma off-road con dos motores eléctricos independientes para torque vectorial real. ${esGasolina ? `Ninguna pickup convencional tiene esto — el ${comp} usa tracción mecánica sin torque vectorial eléctrico.` : `Exclusiva de BYD en este segmento de precio.`}` : `arquitectura diseñada desde cero para vehículos de nueva energía. ${esEV ? `El ${comp} parte de una base convencional electrificada.` : `El ${comp} no tiene plataforma dedicada EV.`}`}` },
+        { text: `<strong>ADAS ${model.adas.split(':')[0]}</strong>: ${esEV ? `el sistema del ${model.fullName} incluye conducción autónoma Nivel 2 con AEB, control de crucero adaptativo ICC y asistente de cambio de carril de serie. El ${comp} ofrece funciones similares pero con menor integración al sistema de conducción del vehículo.` : esHibrido ? `el ${comp} tiene asistentes básicos de seguridad, pero el ${model.fullName} incluye conducción autónoma Nivel 2 completa con ICC, monitoreo del conductor y cámara 360° — funciones que en el ${comp} son opcionales de precio elevado o simplemente no están disponibles.` : `funciones que en el ${comp} no existen o son opcionales de alto costo: el ${model.fullName} las incluye de serie.`}` },
+        { text: model.vtol
+            ? `<strong>VTOL ${model.id.includes('shark') ? '6kW' : '3.3kW'} bidireccional</strong>: tu auto es un generador portátil. Conectas herramientas, electrodomésticos o cargas otro vehículo desde tu ${model.name}. ${tieneVTOL ? `El ${comp} tiene algo similar, pero con menor potencia y mayor costo.` : `El ${comp} no tiene nada comparable a ningún precio.`}`
+            : `<strong>Actualizaciones OTA de por vida</strong>: BYD es una empresa de tecnología que fabrica autos — no al revés. El ${model.fullName} recibe nuevas funciones, mejoras de autonomía y actualizaciones de seguridad sin ir a la agencia. ${tieneOTA ? `El ${comp} también tiene OTA, pero BYD tiene mayor frecuencia de actualizaciones y sin costo adicional en México.` : `El ${comp} no ofrece actualizaciones remotas — su software queda congelado desde el día de compra.`}`
+        },
+        { text: `<strong>BYD: 30 años fabricando baterías antes de hacer autos</strong>. Su ventaja tecnológica es estructural, no de marketing. ${esEV ? `El ${comp} compra sus celdas de batería a proveedores externos. BYD diseña, produce y certifica las suyas internamente — por eso puede dar garantía de 8 años / 200,000 km con total confianza.` : `Mientras el ${comp} subcontrata componentes clave, BYD controla toda la cadena: batería, motor, controladores y software. Eso se traduce en mayor confiabilidad y menor costo de mantenimiento a largo plazo.`}` }
       ],
-      verdict: `El ${model.fullName} es lo que obtienes cuando la empresa que durante 30 años dominó la industria de baterías decide hacer autos. La Blade Battery ${model.batteryIP}, la plataforma ${model.platform.split('·')[0].trim()} y el ADAS de Nivel 2${model.vtol ? ' más el VTOL' : ''} no son features adicionales — son el resultado de una ventaja tecnológica estructural que ${comp} no puede igualar a menos que pague el doble. Esta es la tecnología del futuro, disponible hoy, al precio de hoy.`,
+      verdict: esEV
+        ? `El ${model.fullName} y el ${comp} son eléctricos — pero la tecnología detrás es de diferente generación. La Blade Battery ${model.batteryIP} diseñada internamente, la plataforma ${model.platform.split('·')[0].trim()} nativa EV y el ADAS de Nivel 2 completo de serie colocan al ${model.fullName} un paso adelante. El ${comp} replica la experiencia eléctrica — el ${model.fullName} la define.`
+        : esHibrido
+        ? `El ${comp} usa tecnología híbrida madura — confiable, pero sin la profundidad técnica del ${model.fullName}. La Blade Battery ${model.batteryIP}, la plataforma ${model.platform.split('·')[0].trim()} y el ADAS de Nivel 2 de serie no son extras — son el resultado de 30 años de I+D en baterías aplicado al automóvil. Esta es la diferencia entre un auto que se electrificó y un auto que nació eléctrico.`
+        : `El ${model.fullName} es lo que obtienes cuando la empresa que durante 30 años lideró la industria de baterías decide hacer autos. La Blade Battery ${model.batteryIP}, la plataforma ${model.platform.split('·')[0].trim()} y el ADAS de Nivel 2${model.vtol ? ' más el VTOL' : ''} son ventajas tecnológicas estructurales que el ${comp} no puede igualar a este precio. Esta es la tecnología del futuro, disponible hoy.`,
       objections: [
-        { q: '¿La tecnología china es confiable?', a: `BYD provee baterías a Toyota, Mercedes-Benz y Ford. Su tecnología Blade Battery es tan segura que BYD la somete públicamente a prueba de penetración con clavo, aplastamiento y cortocircuito. Ningún competidor hace esto porque ninguno tiene la misma confianza en su producto.` },
-        { q: '¿Qué pasa cuando los sistemas electrónicos fallan?', a: `El ${model.fullName} tiene diagnóstico remoto via app BYD y acceso de ingenieros certificados via OTA. Además, la arquitectura eléctrica de BYD está diseñada con sistemas de redundancia. La garantía de 6 años/150,000 km cubre todos los sistemas electrónicos del vehículo.` }
+        { q: '¿La tecnología china es confiable a largo plazo?', a: `BYD provee baterías a Toyota, Mercedes-Benz y Ford. Su Blade Battery es tan confiable que BYD la somete públicamente a pruebas de penetración con clavo y aplastamiento — ningún competidor hace esto porque ninguno tiene la misma confianza en su producto. Con 30 años en el mercado de baterías, BYD tiene más experiencia que cualquier fabricante automotriz tradicional.` },
+        { q: esEV ? `¿El ADAS del ${comp} no es equivalente?` : '¿Qué pasa si falla algún sistema electrónico?',
+          a: esEV
+            ? `El ADAS del ${model.fullName} incluye Nivel 2 completo de serie: AEB, ICC con stop-and-go, asistente de cambio de carril y monitoreo del conductor. El ${comp} puede tener funciones similares, pero BYD las integra en una arquitectura diseñada desde cero para EVs — con mayor velocidad de respuesta y menor latencia en los sensores.`
+            : `El ${model.fullName} tiene diagnóstico remoto via app BYD y acceso de ingenieros via OTA. La arquitectura eléctrica incluye sistemas de redundancia. La garantía de 6 años / 150,000 km cubre todos los sistemas electrónicos del vehículo.`
+        }
       ]
     },
     estatus: {
-      painPoint: `Tu auto dice quién eres antes de que abras la boca. El ${model.fullName} no es para quien sigue tendencias — es para quien las define.`,
+      painPoint: `Tu auto dice quién eres antes de que abras la boca. Aquí te explicamos por qué el ${model.fullName} comunica algo diferente al ${comp} — y por qué eso importa en ${ciudad}.`,
       metrics: [
         { value: '#1', label: 'ventas EV mundial' },
         { value: '2026', label: 'modelo año' },
@@ -1236,16 +1409,24 @@ function getMotiveContent(model, motive, competitor) {
         { value: '80k+', label: 'unidades en México' }
       ],
       args: [
-        { text: `<strong>BYD es el #1 mundial en ventas de vehículos eléctricos</strong>, superando a Tesla en volumen global. Llegas a una reunión en un BYD y la conversación empieza antes de apagar el motor. No es la marca del que no supo — es la marca del que sabe lo que viene.` },
-        { text: `El ${model.fullName} <strong>con precio de ${(model.price/1000000).toFixed(2).replace('.',',')} millones</strong> te ubica en un segmento donde los demás llegan en ${comp}. La diferencia es visible. La distinción es real.` },
-        { text: `<strong>Ser pionero en Ciudad del Carmen</strong>: en una ciudad de ejecutivos petroleros, médicos y empresarios, llegar en un BYD ${model.name} comunica que tú tomas decisiones antes que los demás. Aquí eso vale.` },
-        { text: `<strong>Tecnología que impresiona en frío</strong>: ${model.vtol ? 'el VTOL (generador portátil de 6kW) — ninguna pickup en México tiene esto. Abres la caja, conectas el compresor, la sierra o el proyector, y los demás no saben qué miraron.' : model.pantalla.includes('15.6') ? 'la pantalla de 15.6 pulgadas giratoria domina la cabina. Cuando alguien sube al copiloto, el comentario es inevitable.' : `la pantalla de ${model.pantalla} y el silencio de la cabina eléctrica hacen que cualquiera que suba se pregunte qué está pasando.`}` },
-        { text: `<strong>Escasez relativa = exclusividad real</strong>: BYD vendió 80,000+ unidades en México, pero el ${model.fullName} sigue siendo poco común en Ciudad del Carmen. Quien lo tiene, llama la atención. Y con razón.` }
+        { text: `<strong>BYD es el #1 mundial en ventas de vehículos eléctricos</strong>, superando a Tesla en volumen global. ${esEV ? `Mientras el ${comp} también es eléctrico, llegar en un BYD comunica algo distinto: que elegiste la marca que lidera la industria, no una que la sigue.` : esHibrido ? `Mientras el ${comp} es un híbrido conocido y predecible, el BYD ${model.name} genera conversación — es el auto del que todos quieren saber más.` : `Llegas a una reunión en un BYD ${model.name} y la conversación empieza antes de apagar el motor. No es la marca del que no supo — es la marca del que sabe lo que viene.`}` },
+        { text: `El ${model.fullName} <strong>a $${(model.price/1000000).toFixed(2).replace('.',',')} millones</strong> te posiciona en un segmento donde ${esEV ? `el ${comp} es el punto de referencia — y tú lo superas en tecnología y respaldo de marca global.` : `el ${comp} es la opción convencional. Tú eliges la disruptiva. La diferencia es visible desde el estacionamiento.`}` },
+        { text: `<strong>Ser pionero en ${ciudad}</strong>: en una ciudad de ejecutivos petroleros, médicos y empresarios, llegar en un BYD ${model.name} comunica que tomas decisiones antes que los demás. ${esEV ? `El ${comp} también es eléctrico, pero el BYD ${model.name} tiene mayor presencia visual y reconocimiento de marca en el mercado local.` : `Mientras el ${comp} ya es familiar para todos, el BYD ${model.name} todavía genera preguntas — y eso es exactamente lo que buscas.`}` },
+        { text: `<strong>Tecnología que impresiona en frío</strong>: ${model.vtol ? `el VTOL de ${model.id.includes('shark') ? '6kW' : '3.3kW'} — conectas el compresor, la sierra o el proyector directo del auto. ${esEV ? `El ${comp} no tiene esto.` : `Ninguna pickup convencional tiene esto.`} Cuando lo demuestras, el impacto es inmediato.` : model.pantalla.includes('15.6') ? `la pantalla de 15.6" giratoria domina la cabina. Cuando alguien sube al copiloto, el comentario es inevitable. ${esEV ? `El ${comp} tiene pantalla grande también — pero la giratoria de BYD es única en este segmento de precio.` : `El ${comp} no tiene nada comparable.`}` : `la pantalla de ${model.pantalla} y el silencio total de la cabina hacen que cualquiera que suba se pregunte qué está pasando. ${esHibrido||esGasolina ? `El ${comp} nunca logra ese silencio eléctrico.` : ''}`}` },
+        { text: `<strong>Exclusividad real en ${ciudad}</strong>: BYD vendió 80,000+ unidades en México, pero el ${model.fullName} sigue siendo poco común en la ciudad. ${esEV ? `El ${comp} es aún más escaso — pero el BYD ${model.name} tiene mayor reconocimiento de marca entre ejecutivos y empresarios que ya conocen BYD por el Shark y el Seal.` : `Quien lo tiene llama la atención. La conversación la generas tú antes de bajar del auto.`}` }
       ],
-      verdict: `Hay autos que te llevan del punto A al punto B. Y hay autos que hacen que el punto A y el punto B recuerden que estuviste ahí. El ${model.fullName} es de los segundos. Mientras ${comp} te da lo que todos tienen, el BYD ${model.name} te da lo que define a quien va delante. En un mercado donde el ejecutivo que te recibe mira el estacionamiento antes de abrir la puerta, esto importa.`,
+      verdict: esEV
+        ? `Los dos son eléctricos — pero no comunican lo mismo. El BYD ${model.name} lleva el respaldo de la marca #1 mundial en EVs, la Blade Battery más certificada de la industria y un diseño que no pasa desapercibido. El ${comp} es una alternativa válida — el BYD ${model.name} es una declaración. En ${ciudad}, donde las decisiones se notan, esa diferencia importa.`
+        : esHibrido
+        ? `El ${comp} te da lo que todos reconocen. El BYD ${model.name} te da lo que todos preguntan. En ${ciudad}, donde el estatus se construye con decisiones adelantadas, llegar en el auto que lidera la revolución eléctrica global dice más que cualquier marca convencional. Tú no seguiste la tendencia — la anticipaste.`
+        : `Hay autos que te llevan del punto A al B. Y hay autos que hacen que el punto A y el B recuerden que estuviste ahí. El ${model.fullName} es de los segundos. Mientras el ${comp} te da lo que todos tienen, el BYD ${model.name} te da lo que define a quien va delante. En ${ciudad}, donde el ejecutivo que te recibe mira el estacionamiento antes de abrir la puerta, esto importa.`,
       objections: [
-        { q: '¿No pierdo estatus por ser marca china?', a: `Samsung era "la marca coreana barata" en 2005. Hoy lidera el mercado premium global. BYD es hoy exactamente donde Samsung era entonces — y quien lo entendió primero fue quien capitalizó. En México, los ejecutivos que compraron BYD Shark y Seal en 2023-2024 ya son referencia en sus círculos.` },
-        { q: '¿Y el valor de reventa?', a: `BYD ha sostenido precios de reventa sólidos en México por la alta demanda y la escasez relativa. La demanda supera a la oferta en modelos como el Shark y el Seal. El mercado secundario está activo y los precios se mantienen mejor que muchos competidores japoneses o estadounidenses.` }
+        { q: '¿No pierdo estatus por ser marca china?', a: `Samsung era "la marca coreana barata" en 2005. Hoy lidera el mercado premium global. BYD está exactamente donde Samsung estaba entonces — y quien lo entendió primero fue quien capitalizó. Los ejecutivos que compraron BYD Shark y Seal en 2023-2024 ya son referencia en sus círculos en México.` },
+        { q: esEV ? `¿El ${comp} no tiene el mismo posicionamiento siendo también eléctrico?` : '¿Y el valor de reventa?',
+          a: esEV
+            ? `El ${comp} compite en el mismo espacio, pero BYD tiene mayor red de distribución en México (80,000+ unidades), mayor reconocimiento entre compradores de alto perfil y respaldo de la empresa con más experiencia en baterías del mundo. En ${ciudad}, el BYD ${model.name} ya tiene comunidad — el ${comp} todavía la está construyendo.`
+            : `BYD ha sostenido precios de reventa sólidos por la alta demanda y escasez relativa en México. El mercado secundario está activo y los precios se mantienen mejor que muchos competidores japoneses o estadounidenses en los mismos segmentos.`
+        }
       ]
     }
   };
@@ -1295,8 +1476,63 @@ function selectCompTag(el, name) {
   checkReady();
 }
 
+// ─────────────────────────────────────────────
+// MODO ASESOR vs MODO CLIENTE (URL PARAMS)
+// ─────────────────────────────────────────────
+window._modoCliente = false;
+window._asesorNombre = '';
+window._asesorWA = '';
+
+function leerURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  const plaza = params.get('plaza');
+  const asesor = params.get('asesor');
+  const wa = params.get('wa');
+
+  if (plaza && asesor && wa) {
+    window._modoCliente = true;
+    window._asesorNombre = decodeURIComponent(asesor);
+    window._asesorWA = wa;
+    selectedPlaza = plaza;
+
+    // Ocultar paso 00 de asesor, mostrar banner de asesor
+    document.getElementById('modoAsesor').style.display = 'none';
+    document.getElementById('modoClienteInfo').style.display = 'flex';
+    document.getElementById('clientePlazaNombre').textContent = PLAZAS[plaza] ? PLAZAS[plaza].nombre : plaza;
+    document.getElementById('clienteAsesorNombre').textContent = window._asesorNombre;
+    document.getElementById('clienteAsesorWA').textContent = wa;
+  } else {
+    window._modoCliente = false;
+    document.getElementById('modoAsesor').style.display = 'flex';
+    document.getElementById('modoClienteInfo').style.display = 'none';
+  }
+}
+
+function generarLinkAsesor() {
+  const nombre = document.getElementById('asesorNombre').value.trim();
+  const wa = document.getElementById('asesorWA').value.trim().replace(/\D/g,'');
+  if (!selectedPlaza || nombre.length < 2 || wa.length < 8) {
+    alert('Completa plaza, nombre y WhatsApp para generar tu link.');
+    return;
+  }
+  const base = window.location.origin + window.location.pathname;
+  const link = `${base}?plaza=${selectedPlaza}&asesor=${encodeURIComponent(nombre)}&wa=${wa}`;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('btnCopiarLink');
+    btn.textContent = '✓ LINK COPIADO';
+    btn.style.background = 'var(--motive-autonomia)';
+    btn.style.color = 'var(--byd-dark)';
+    setTimeout(() => {
+      btn.textContent = '🔗 COPIAR MI LINK PERSONALIZADO';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2500);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderModelGrid();
+  leerURLParams();
 
   document.querySelectorAll('.motive-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1316,7 +1552,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkReady() {
   const btn = document.getElementById('genBtn');
-  btn.disabled = !(selectedModel && selectedMotive && selectedCompetitor.trim().length > 1);
+  if (window._modoCliente) {
+    btn.disabled = !(selectedModel && selectedMotive && selectedCompetitor.trim().length > 1);
+  } else {
+    const nombre = document.getElementById('asesorNombre').value.trim();
+    const wa = document.getElementById('asesorWA').value.trim();
+    btn.disabled = !(selectedPlaza && selectedModel && selectedMotive && selectedCompetitor.trim().length > 1 && nombre.length > 2 && wa.length > 7);
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -1328,7 +1570,6 @@ function generate() {
   loading.classList.add('visible');
   result.classList.remove('visible');
   result.innerHTML = '';
-
   setTimeout(() => {
     loading.classList.remove('visible');
     buildCard();
@@ -1340,6 +1581,10 @@ function buildCard() {
   const motive = selectedMotive;
   const comp = selectedCompetitor.trim();
   const c = getMotiveContent(m, motive, comp);
+  const asesorNombre = window._modoCliente ? window._asesorNombre : document.getElementById('asesorNombre').value.trim();
+  const asesorWA = window._modoCliente ? window._asesorWA : document.getElementById('asesorWA').value.trim().replace(/\D/g,'');
+  const waNum = asesorWA.startsWith('52') ? asesorWA : '52' + asesorWA;
+  const plazaNombre = PLAZAS[selectedPlaza] ? PLAZAS[selectedPlaza].nombre : 'APV BYD';
 
   const motiveColors = {
     autonomia: 'var(--motive-autonomia)',
@@ -1418,10 +1663,11 @@ function buildCard() {
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--byd-gray);text-align:right">
-            APV BYD CIUDAD DEL CARMEN<br>
-            WhatsApp: 55 7889 8322
+            ${plazaNombre}<br>
+            <strong style="color:var(--byd-cyan)">${asesorNombre}</strong><br>
+            WhatsApp: ${asesorWA}
           </div>
-          <a class="cta-btn" href="https://wa.me/525578898322?text=Hola%20Gabriel%2C%20me%20interesa%20el%20BYD%20${encodeURIComponent(m.name)}%20y%20quiero%20más%20información." target="_blank">AGENDAR TEST DRIVE</a>
+          <a class="cta-btn" href="https://wa.me/${waNum}?text=Hola%20${encodeURIComponent(asesorNombre)}%2C%20vi%20la%20comparativa%20del%20BYD%20${encodeURIComponent(m.name)}%20y%20me%20interesa%20agendar%20un%20test%20drive." target="_blank">AGENDAR TEST DRIVE</a>
         </div>
       </div>
     </div>
@@ -1436,11 +1682,12 @@ function buildCard() {
 function buildCompTable(m, motive, comp) {
   const rows = {
     autonomia: [
-      { label:'Autonomía EV pura', byd: m.autonomiaEV, rival: rivalData(comp,'autonomia_ev'), desc:'km en modo 100% eléctrico' },
+      { label:'Autonomía eléctrica', byd: m.autonomiaEV, rival: rivalData(comp,'autonomia_ev'), desc:'km en modo 100% eléctrico' },
       { label:'Autonomía total', byd: m.autonomiaTotal, rival: rivalData(comp,'autonomia_total'), desc:'' },
-      { label:'Eficiencia', byd: m.consumo, rival: rivalData(comp,'consumo'), desc:'' },
+      { label:'Eficiencia energética', byd: m.consumo, rival: rivalData(comp,'consumo'), desc:'' },
+      { label:'Batería / Tecnología', byd: m.battery.split('·')[0].trim(), rival: rivalData(comp,'bateria'), desc:'' },
       { label:'Garantía batería', byd: m.garantiaBat, rival: rivalData(comp,'garantia_bat'), desc:'' },
-      { label:'Ahorro estimado/mes', byd: `$${m.ahorro_mensual_gasolina.toLocaleString()} MXN`, rival: '$0 (gasolina)', desc:'' },
+      { label:'Ahorro estimado/mes vs gasolina', byd: `$${m.ahorro_mensual_gasolina.toLocaleString()} MXN`, rival: rivalData(comp,'ahorro_rival'), desc:'' },
       { label:'Precio base', byd: `$${m.price.toLocaleString()}`, rival: rivalData(comp,'precio'), desc:'' }
     ],
     confort: [
@@ -1496,6 +1743,7 @@ function rivalData(comp, field) {
   const c = comp.toLowerCase();
   const data = {
     autonomia_ev: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '395 km NEDC / ~320 km real (solo EV)';
       if(c.includes('kicks') || c.includes('epower')) return '~0 km (no es enchufable)';
       if(c.includes('rav4 phev') || c.includes('rav4 plug')) return '~46 km';
       if(c.includes('corolla')) return '~0 km (no es enchufable)';
@@ -1510,6 +1758,7 @@ function rivalData(comp, field) {
       return 'Dato no disponible';
     },
     autonomia_total: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '395 km (sin respaldo gasolina)';
       if(c.includes('kicks')) return '~580 km';
       if(c.includes('rav4 phev')) return '~750 km';
       if(c.includes('corolla')) return '~900 km';
@@ -1523,6 +1772,7 @@ function rivalData(comp, field) {
       return 'Similar (~600-800 km)';
     },
     consumo: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '11.8 kWh/100km';
       if(c.includes('kicks')) return '~17 km/L';
       if(c.includes('rav4') && !c.includes('phev')) return '~12 km/L';
       if(c.includes('corolla')) return '~18 km/L (HEV)';
@@ -1532,13 +1782,24 @@ function rivalData(comp, field) {
       if(c.includes('hr-v')) return '~16 km/L';
       return '~12-15 km/L';
     },
+    ahorro_rival: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '~$3,000 MXN/mes (también eléctrico)';
+      if(c.includes('tesla')) return '~$3,500 MXN/mes (también eléctrico)';
+      if(c.includes('kia ev6') || c.includes('ioniq') || c.includes('mg4') || c.includes('mg zs')) return '~$3,000 MXN/mes (también eléctrico)';
+      if(c.includes('rav4 phev') || c.includes('sienna') || c.includes('corolla hev') || c.includes('kicks')) return '~$1,500 MXN/mes (híbrido)';
+      return '$0 ahorro (gasolina/diésel)';
+    },
     garantia_bat: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '8 años / 150,000 km (tren motriz)';
       if(c.includes('tesla')) return '8 años / 150,000 km';
       if(c.includes('kia')) return '7 años / 150,000 km';
       if(c.includes('toyota') || c.includes('lexus')) return '10 años / 250,000 km (HV)';
       return '5-8 años según modelo';
     },
     precio: () => {
+      if(c.includes('geely ex2 gl') || c.includes('ex2 gl')) return '$389,900 MXN (GL)';
+      if(c.includes('geely ex2 gf') || c.includes('ex2 gf')) return '$419,900 MXN (GF)';
+      if(c.includes('geely') || c.includes('ex2')) return '$389,900 - $419,900 MXN';
       if(c.includes('kicks')) return '~$415,000-480,000 MXN';
       if(c.includes('rav4') && c.includes('hybrid')) return '~$750,000-900,000 MXN';
       if(c.includes('rav4')) return '~$600,000-750,000 MXN';
@@ -1555,6 +1816,7 @@ function rivalData(comp, field) {
       return 'Similar o superior';
     },
     pantalla: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '14.6" táctil HD + 8.8" digital';
       if(c.includes('kicks')) return '8" (versión top)';
       if(c.includes('rav4')) return '10.5" (versión top)';
       if(c.includes('tesla')) return '15.4" táctil central';
@@ -1566,16 +1828,19 @@ function rivalData(comp, field) {
       return '7-10" dependiendo versión';
     },
     asistente: () => {
+      if(c.includes('geely') || c.includes('ex2')) return 'Geely App (2 años gratis) · CarPlay';
       if(c.includes('tesla')) return 'Asistente de voz Tesla';
       if(c.includes('kia') || c.includes('ioniq') || c.includes('hyundai')) return 'Hey Kia / Hey Car';
       return 'Siri / Google (via CarPlay/Android Auto)';
     },
     ota: () => {
+      if(c.includes('geely') || c.includes('ex2')) return 'Parcial vía Geely App';
       if(c.includes('tesla')) return '✓ Actualizaciones OTA';
       if(c.includes('kia ev6') || c.includes('ioniq')) return '✓ OTA parcial';
       return '✗ No incluye OTA';
     },
     cajuela: () => {
+      if(c.includes('geely') || c.includes('ex2')) return '375 L + frunk 70 L / 1,320 L (abatida)';
       if(c.includes('rav4')) return '580 L / 1,690 L (abatida)';
       if(c.includes('cx-5')) return '442 L / 1,504 L (abatida)';
       if(c.includes('kicks')) return '432 L';
@@ -1586,6 +1851,7 @@ function rivalData(comp, field) {
       return 'Similar según segmento';
     },
     bateria: () => {
+      if(c.includes('geely') || c.includes('ex2')) return 'LFP 39.4 kWh (sin Blade)';
       if(c.includes('tesla')) return 'NMC (Litio-Níquel-Manganeso)';
       if(c.includes('kia') || c.includes('ioniq') || c.includes('hyundai')) return 'NMC / NCM';
       if(c.includes('toyota') || c.includes('lexus')) return 'NiMH / Li-ion convencional';
@@ -1593,6 +1859,7 @@ function rivalData(comp, field) {
       return 'Li-ion convencional NMC';
     },
     ip: () => {
+      if(c.includes('geely') || c.includes('ex2')) return 'No certificada IP pública';
       if(c.includes('tesla')) return 'IP67 (estimado)';
       if(c.includes('rivian')) return 'IP67';
       return 'No certificada IP pública';
