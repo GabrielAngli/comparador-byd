@@ -561,26 +561,24 @@ header {
 }
 .obj-q {
   background: rgba(255,107,107,0.08);
-  padding: 12px 16px;
-  font-size: 0.82rem;
+  padding: 12px 18px;
+  font-size: 0.85rem;
   color: #FF9999;
   font-style: italic;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
+  border-left: 3px solid rgba(255,107,107,0.4);
 }
-.obj-q::before { content:'?'; font-family:'Bebas Neue',sans-serif; font-size:1rem; opacity:0.6; }
+.obj-q::before { content:''; }
 .obj-a {
   background: rgba(0,200,150,0.05);
-  padding: 12px 16px;
-  font-size: 0.82rem;
+  padding: 14px 18px;
+  font-size: 0.85rem;
   color: var(--byd-white);
-  line-height: 1.55;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  line-height: 1.7;
+  display: block;
+  border-left: 3px solid var(--motive-autonomia);
 }
-.obj-a::before { content:'→'; color: var(--motive-autonomia); flex-shrink:0; }
+.obj-a::before { content:''; }
 
 /* ── CTA FOOTER ── */
 .card-footer {
@@ -1651,8 +1649,22 @@ function buildCard() {
           <p class="verdict-text">${c.verdict}</p>
         </div>
 
-        <div class="section-title">OBJECIONES QUE TE PUEDES HACER</div>
-        <div class="obj-list">${objHTML}</div>
+        <div class="section-title">TUS DUDAS · ELIGE 2 PREGUNTAS</div>
+        <div id="objSelectors" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+          <select id="objSelect1" onchange="renderObjeciones()" style="
+            background:rgba(10,46,110,0.5);border:1px solid var(--byd-line);border-radius:8px;
+            color:var(--byd-white);font-family:'DM Sans',sans-serif;font-size:0.85rem;
+            padding:12px 16px;outline:none;cursor:pointer;width:100%">
+            <option value="">— Elige tu primera duda —</option>
+          </select>
+          <select id="objSelect2" onchange="renderObjeciones()" style="
+            background:rgba(10,46,110,0.5);border:1px solid var(--byd-line);border-radius:8px;
+            color:var(--byd-white);font-family:'DM Sans',sans-serif;font-size:0.85rem;
+            padding:12px 16px;outline:none;cursor:pointer;width:100%">
+            <option value="">— Elige tu segunda duda —</option>
+          </select>
+        </div>
+        <div class="obj-list" id="objRespuestas"></div>
 
       </div>
 
@@ -1677,6 +1689,125 @@ function buildCard() {
   result.innerHTML = html;
   result.classList.add('visible');
   result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  poblarSelectsObjeciones();
+}
+
+// ─────────────────────────────────────────────
+// CATÁLOGO DE OBJECIONES
+// ─────────────────────────────────────────────
+function getCatalogoObjeciones(model, comp) {
+  const m = model;
+  const cl = comp.toLowerCase();
+  const esEV = cl.includes('geely')||cl.includes('ex2')||cl.includes('tesla')||cl.includes('ev6')||cl.includes('ioniq')||cl.includes('leaf')||cl.includes('mg4')||cl.includes('kia ev')||cl.includes('zoe')||cl.includes('ariya');
+  const esHibrido = cl.includes('kicks')||cl.includes('epower')||cl.includes('hr-v')||cl.includes('hrv')||cl.includes('corolla hev')||cl.includes('sienna')||cl.includes('rav4 hybrid');
+
+  return [
+    {
+      id: 'lluvias',
+      q: '¿La batería aguanta las lluvias e inundaciones de la región?',
+      a: `La Blade Battery del ${m.fullName} tiene certificación <strong>${m.batteryIP}</strong> — lo que significa que puede sumergirse en agua${m.batteryIP === 'IP68' ? ' hasta 1.5 metros de profundidad por 30 minutos' : ' y resistir encharcamientos típicos de la región'}. En ${['carmen','campeche','cancun','playa'].includes(selectedPlaza) ? 'el sureste mexicano' : 'tu ciudad'}, donde las lluvias intensas y encharcamientos son frecuentes, esto no es un detalle menor — es una garantía de que tu inversión está protegida. ${esEV ? `El ${comp} también es eléctrico pero no publica su certificación IP de batería — BYD sí.` : `El ${comp} con su motor convencional tiene riesgo de hidrolock si el nivel del agua supera el filtro de aire. El ${m.fullName} no tiene esa vulnerabilidad en modo eléctrico.`}`
+    },
+    {
+      id: 'bateria_dano',
+      q: '¿Qué pasa si la batería se daña o se agota?',
+      a: `La Blade Battery está garantizada por <strong>${m.garantiaBat}</strong> — la cobertura más amplia de su categoría. Si en ese período la batería baja de 70% de su capacidad original, BYD la reemplaza sin costo. Además, la química LFP de la Blade Battery es inherentemente más estable que las baterías NMC: no presenta fuga térmica (thermal runaway) y mantiene >80% de capacidad después de 3,000 ciclos. ${m.type !== 'EV' ? `Y si la batería llega a cero, el motor de gasolina toma el control automáticamente — nunca quedas varado.` : `El wallbox incluido garantiza que siempre arranques con carga completa si cargas cada noche.`}`
+    },
+    {
+      id: 'confiabilidad',
+      q: '¿Es confiable la tecnología china a largo plazo?',
+      a: `BYD provee baterías a <strong>Toyota, Mercedes-Benz y Ford</strong> — las marcas más exigentes en control de calidad del mundo. Llevan más de 30 años fabricando baterías antes de hacer autos. La Blade Battery se somete públicamente a prueba de penetración con clavo, aplastamiento y cortocircuito sin incendiarse — ningún competidor hace esto porque ninguno tiene la misma confianza en su producto. Samsung era "la marca coreana barata" en 2005. Hoy lidera el mercado global. BYD está exactamente en ese punto de inflexión.`
+    },
+    {
+      id: 'mantenimiento',
+      q: '¿Qué tan seguido necesita mantenimiento y cuánto cuesta?',
+      a: `El ${m.fullName} tiene un costo de mantenimiento hasta <strong>40% menor</strong> que un auto convencional. Sin cambios de aceite frecuentes, sin correa de distribución, sin ajuste de clutch. Los frenos duran más gracias a la regeneración eléctrica. ${m.garantiaBat.includes('3 años') ? 'Además incluye 3 años de mantenimiento gratis.' : 'El primer servicio es a los 15,000 km o 12 meses.'} BYD tiene red de servicio autorizado en México con técnicos certificados y diagnóstico remoto via app.`
+    },
+    {
+      id: 'costo_inicial',
+      q: '¿Sale más caro que un auto convencional al comprarlo?',
+      a: `El precio del ${m.fullName} es $${m.price.toLocaleString()} MXN con IVA y wall box incluido. ${esEV ? `Comparable al ${comp} en precio, pero con mayor tecnología de batería y garantía.` : esHibrido ? `Similar al ${comp} en precio, pero con autonomía eléctrica que el ${comp} no puede ofrecer.` : `Puede ser mayor al ${comp} en precio de lista, pero hay que comparar el costo total de propiedad: sin gasolina diaria, con menor mantenimiento y con el bono flexible de hasta $35,000 MXN aplicable al enganche.`} Con el bono flexible vigente este mes y financiamiento desde 5% de enganche con BBVA, Santander o Banorte, la diferencia inicial se reduce significativamente.`
+    },
+    {
+      id: 'roi',
+      q: '¿Cuánto tarda en recuperarse la inversión?',
+      a: `Estimado conservador para ${['carmen','campeche','cancun','playa'].includes(selectedPlaza) ? 'el sureste' : 'tu zona'}: ahorro mensual en combustible de <strong>$${m.ahorro_mensual_gasolina.toLocaleString()} MXN</strong> más reducción en mantenimiento de $600-800 MXN/mes. Total: $${(m.ahorro_mensual_gasolina + 700).toLocaleString()} MXN/mes de ahorro real. Adicionalmente, si calificas como persona moral, la deducción inmediata del 86% del valor del vehículo bajo el Plan México 2026 puede generar un ahorro fiscal de más de $150,000 MXN dependiendo de tu tasa de ISR — lo que cambia radicalmente el cálculo de retorno.`
+    },
+    {
+      id: 'reventa',
+      q: '¿Qué valor de reventa tiene un BYD en México?',
+      a: `BYD ha sostenido precios de reventa sólidos en México por alta demanda y oferta limitada. Modelos como el Shark y el Seal mantienen 75-80% de su valor al segundo año — comparable con Toyota y superior a marcas americanas en el mismo segmento. La demanda en el mercado secundario supera a la oferta actualmente. Además, la garantía transferible de batería de ${m.garantiaBat} es un argumento de reventa que ningún auto de gasolina puede ofrecer.`
+    },
+    {
+      id: 'financiamiento',
+      q: '¿El financiamiento es accesible y con quién aplica?',
+      a: `El ${m.fullName} se puede financiar desde <strong>5% de enganche</strong> con BBVA, Santander, Banorte y Kuna — los bancos más accesibles del país. El bono flexible vigente de hasta $35,000 MXN se puede aplicar directamente al enganche o a la tasa de interés, reduciendo tu pago mensual desde el primer mes. Para personas morales, el arrendamiento financiero es deducible hasta $285 MXN/día. Podemos hacer una cotización personalizada según tu perfil en este momento.`
+    },
+    {
+      id: 'carga_casa',
+      q: '¿Dónde cargo el auto si no tengo cargador en casa?',
+      a: `El ${m.fullName} incluye <strong>wall box de 7kW</strong> en el precio — se instala en tu cochera o estacionamiento y carga completamente en 4-6 horas durante la noche. Si vives en departamento, el cargador de emergencia de 1.4kW incluido funciona con cualquier contacto doméstico estándar (aunque es más lento). En ${['carmen','campeche','cancun','playa'].includes(selectedPlaza) ? 'el sureste' : 'México'} la red de carga pública crece mensualmente con estaciones en plazas comerciales, hoteles y gasolineras. ${m.type !== 'EV' ? `Y recuerda: el ${m.fullName} es híbrido — puedes cargar gasolina en cualquier gasolinera cuando no tengas acceso a carga eléctrica.` : ''}`
+    },
+    {
+      id: 'viaje_largo',
+      q: '¿Qué pasa en viaje largo si se acaba la carga?',
+      a: `${m.type === 'EV' ? `Con ${m.autonomiaEV} de autonomía real, un viaje de Ciudad del Carmen a Campeche o Mérida es completamente viable con una carga. Para viajes más largos, la red de carga rápida DC del ${m.fullName} recupera del 30% al 80% en 20-30 minutos — similar a una parada de descanso. La app BYD muestra cargadores disponibles en ruta en tiempo real.` : `El ${m.fullName} tiene ${m.autonomiaTotal} de autonomía combinada — más que suficiente para cualquier trayecto regional. Cuando la batería eléctrica se agota, el motor de gasolina toma el control automáticamente sin perder potencia ni velocidad. Puedes hacer Ciudad del Carmen-Mérida-Cancún sin preocuparte por carga eléctrica.`}`
+    },
+    {
+      id: 'servicio_tecnico',
+      q: '¿Hay servicio técnico cerca en caso de falla?',
+      a: `BYD tiene red de distribuidores autorizados con taller certificado en todo el sureste. El ${m.fullName} incluye diagnóstico remoto via app BYD — en muchos casos el técnico puede identificar y resolver el problema sin que lleves el auto al taller. Adicionalmente, BYD México ofrece asistencia en carretera 24/7 los 365 días del año. La garantía de ${m.garantiaVeh} incluye mano de obra y refacciones en cualquier distribuidor autorizado de la red nacional.`
+    },
+    {
+      id: 'presencia_mexico',
+      q: '¿BYD tiene suficiente presencia y respaldo en México?',
+      a: `BYD lleva más de 3 años en México con <strong>80,000+ unidades vendidas</strong> y una red en crecimiento constante. Es el fabricante de vehículos eléctricos #1 a nivel mundial — no una marca experimental. En México cuenta con distribuidores autorizados, talleres certificados, stock de refacciones y un equipo de soporte técnico nacional. El Grupo Farrera, con décadas de presencia en el sureste, respalda localmente cada venta con servicio postventa completo.`
+    },
+    {
+      id: 'vs_japonesas',
+      q: '¿Cómo compara BYD con marcas japonesas o americanas?',
+      a: `${esHibrido ? `El ${comp} es un excelente auto — pero es tecnología híbrida de hace 10-15 años. El ${m.fullName} es tecnología de nueva generación: enchufable, con mayor autonomía eléctrica, ADAS de Nivel 2 de serie y Blade Battery certificada ${m.batteryIP}. Comparar el ${comp} con el ${m.fullName} es como comparar un Nokia 3310 con un smartphone — ambos hacen llamadas, pero la experiencia es completamente diferente.` : `Las marcas japonesas y americanas tienen décadas de reputación — y BYD respeta eso. Pero en tecnología de baterías, BYD lleva 30 años de ventaja sobre cualquiera de ellas. Toyota le compra baterías a BYD. Mercedes-Benz le compra baterías a BYD. Ford le compra baterías a BYD. Cuando las mejores marcas del mundo confían en tu tecnología, la pregunta ya no es si BYD es confiable — sino por qué no elegirlo directamente.`}`
+    }
+  ];
+}
+
+function poblarSelectsObjeciones() {
+  const model = selectedModel;
+  const comp = selectedCompetitor.trim();
+  if (!model || !comp) return;
+
+  const catalogo = getCatalogoObjeciones(model, comp);
+  const sel1 = document.getElementById('objSelect1');
+  const sel2 = document.getElementById('objSelect2');
+  if (!sel1 || !sel2) return;
+
+  const opcionesHTML = catalogo.map(o => `<option value="${o.id}">${o.q}</option>`).join('');
+  sel1.innerHTML = `<option value="">— Elige tu primera duda —</option>${opcionesHTML}`;
+  sel2.innerHTML = `<option value="">— Elige tu segunda duda —</option>${opcionesHTML}`;
+}
+
+function renderObjeciones() {
+  const model = selectedModel;
+  const comp = selectedCompetitor.trim();
+  const id1 = document.getElementById('objSelect1').value;
+  const id2 = document.getElementById('objSelect2').value;
+  const catalogo = getCatalogoObjeciones(model, comp);
+  const contenedor = document.getElementById('objRespuestas');
+
+  // Evitar que elijan la misma en ambos
+  if (id1 && id2 && id1 === id2) {
+    contenedor.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:#FF9999;padding:10px">Elige dos preguntas diferentes.</div>`;
+    return;
+  }
+
+  const seleccionadas = catalogo.filter(o => o.id === id1 || o.id === id2);
+  if (seleccionadas.length === 0) { contenedor.innerHTML = ''; return; }
+
+  contenedor.innerHTML = seleccionadas.map(o => `
+    <div class="obj-item">
+      <div class="obj-q">${o.q}</div>
+      <div class="obj-a">${o.a}</div>
+    </div>
+  `).join('');
 }
 
 function buildCompTable(m, motive, comp) {
